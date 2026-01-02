@@ -7,6 +7,8 @@
           v-model="searchQuery"
           placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等"
           class="flex-1"
+          :useApi="true"
+          @search="handleSearch"
         />
         <div class="flex items-center gap-4">
           <button type="button" class="flex h-6 w-6 items-center justify-center rounded-full">
@@ -78,7 +80,7 @@
               </div>
 
               <BaseTypography variant="subtitle" tag="p" class="font-primary text-subtitle">
-                聚樂部課程，選課後上課，學習很簡單！
+                聚樂部課程，選課後上課，學習很簡單
               </BaseTypography>
 
               <!-- 課程卡片會填滿剩餘空間 -->
@@ -139,6 +141,13 @@ interface CarouselItem {
 type FrequencyCardValue = number | string
 
 const searchQuery = ref('')
+
+// 搜尋處理函數
+const handleSearch = (query: string) => {
+  console.log('執行搜尋:', query)
+  // 這裡可以導航到搜尋結果頁面
+  // navigateTo(`/search?q=${encodeURIComponent(query)}`)
+}
 
 const statsItems = [
   { value: '-', label: '-', color: '#6B3F2E', maxValue: 100 },

@@ -36,7 +36,7 @@ const sidebarMenuItems = [
     children: [
       { name: '聚樂部', path: '/club', locked: false },
       { name: '反轉學習', path: '/flipped-learning', locked: true },
-      { name: 'MK大廳', path: '/mk-lobby', locked: true }
+      { name: 'MK大廳', path: '/mk-lobby', locked: false }
     ]
   },
   { name: '個人資料', path: '/profile', icon: '/images/file.svg' },

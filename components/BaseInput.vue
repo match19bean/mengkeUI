@@ -29,13 +29,23 @@ interface Props {
   error?: boolean
   errorMessage?: string
   disabled?: boolean
+  width?: string
+  bgColor?: string
+  textAlign?: 'left' | 'center' | 'right'
+  textColor?: string
+  textSize?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   type: 'text',
   disabled: false,
-  error: false
+  error: false,
+  width: 'w-full',
+  bgColor: 'bg-white',
+  textAlign: 'left',
+  textColor: 'text-brown-1',
+  textSize: 'text-base'
 })
 
 const emit = defineEmits<{
@@ -51,7 +61,8 @@ const inputValue = computed({
 })
 
 const inputClasses = computed(() => {
-  const baseClasses = 'w-full h-[50px] px-4 py-2 text-base font-primary border-[1.5px] rounded-xl bg-white text-brown-1 transition-all duration-200 placeholder:text-brown-6'
+  const textAlignClass = props.textAlign === 'center' ? 'text-center' : props.textAlign === 'right' ? 'text-right' : 'text-left'
+  const baseClasses = `${props.width} h-[50px] px-4 py-2 ${props.textSize} font-primary rounded-full ${props.bgColor} ${textAlignClass} ${props.textColor} transition-all duration-200 placeholder:text-brown-6`
   const normalClasses = 'border-brown-1 hover:border-brown-4 focus:border-secondary-1 focus:outline-none focus:ring-2 focus:ring-secondary-1/30'
   const errorClasses = 'border-alert-1 focus:ring-alert-1/30 text-alert-1'
   const disabledClasses = 'bg-brown-9 cursor-not-allowed opacity-60'

@@ -1,5 +1,10 @@
 <template>
   <div class="relative w-full">
+    <!-- Debug 信息 -->
+    <div style="position: fixed; top: 10px; right: 10px; background: yellow; padding: 5px; z-index: 9999; font-size: 12px;">
+      useApi: {{ useApi }}
+    </div>
+    
     <div class="relative">
       <!-- 搜尋圖示 -->
       <div class="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -14,6 +19,7 @@
         ref="inputRef"
         :value="modelValue"
         @input="handleInput"
+        @keydown="handleKeydown"
         @focus="showDropdown = true"
         @blur="handleBlur"
         :placeholder="placeholder"
@@ -42,9 +48,9 @@
     <!-- 下拉建議列表 -->
     <div
       v-if="showDropdown && filteredSuggestions.length > 0"
-      class="absolute w-full bg-cream rounded-b-[16px] border-2 border-t-0 border-brown-2 shadow-lg overflow-hidden z-10"
+      class="absolute w-[460px] bg-cream rounded-b-[16px] border-2 border-t-0 border-brown-2 shadow-lg overflow-hidden z-10"
     >
-      <div class="max-h-[280px] overflow-y-auto">
+      <div class="max-h-[280px] w-[460px] overflow-y-auto">
         <button
           v-for="(suggestion, index) in filteredSuggestions"
           :key="index"
@@ -112,35 +118,121 @@ interface Props {
   placeholder?: string
   disabled?: boolean
   suggestions?: SearchSuggestion[]
+  useApi?: boolean
+  searchDelay?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   placeholder: '搜尋',
   disabled: false,
-  suggestions: () => []
+  suggestions: () => [],
+  useApi: false,
+  searchDelay: 300
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'select': [suggestion: SearchSuggestion]
+  'search': [query: string]
 }>()
 
 const inputRef = ref<HTMLInputElement>()
 const showDropdown = ref(false)
+const apiSuggestions = ref<string[]>([])
+const searchTimeout = ref<ReturnType<typeof setTimeout>>()
+
+// 如果使用 API，初始化 searchStore
+const searchStore = props.useApi ? useSearchStore() : null
+
+// Debug: 在組件掛載時輸出 props
+onMounted(() => {
+  console.log('BaseSearchInput mounted, useApi:', props.useApi)
+  console.log('searchStore:', searchStore)
+})
 
 const filteredSuggestions = computed(() => {
+  console.log('計算 filteredSuggestions, modelValue:', props.modelValue)
+  console.log('useApi:', props.useApi)
+  console.log('apiSuggestions:', apiSuggestions.value)
+  
   if (!props.modelValue) return []
   
-  return props.suggestions.filter(suggestion =>
+  // 如果使用 API 且有 API 建議
+  if (props.useApi && apiSuggestions.value.length > 0) {
+    const result = apiSuggestions.value.map(title => ({ 
+      title,
+      badge: undefined,
+      badgeColor: undefined,
+      disabled: false
+    } as SearchSuggestion))
+    console.log('返回 API 建議:', result)
+    return result
+  }
+  
+  // 否則使用本地建議
+  const localResult = props.suggestions.filter(suggestion =>
     suggestion.title.toLowerCase().includes(props.modelValue.toLowerCase())
   )
+  console.log('返回本地建議:', localResult)
+  return localResult
 })
 
 const handleInput = (event: Event) => {
   const value = (event.target as HTMLInputElement).value
   emit('update:modelValue', value)
   showDropdown.value = true
+
+  console.log('handleInput 被觸發, value:', value, 'useApi:', props.useApi)
+
+  // 如果使用 API，延遲獲取建議
+  if (props.useApi && value.trim().length >= 2) {
+    console.log('準備呼叫 API...')
+    
+    // 清除之前的計時器
+    if (searchTimeout.value) {
+      clearTimeout(searchTimeout.value)
+    }
+
+    // 設置新的計時器
+    searchTimeout.value = setTimeout(async () => {
+      console.log('開始呼叫 API, searchStore:', searchStore)
+      
+      if (!searchStore) {
+        console.error('searchStore 未初始化')
+        return
+      }
+      
+      try {
+        const response = await searchStore.getSearchSuggestions({
+          query: value,
+          limit: 5
+        })
+        
+        console.log('API 回應:', response)
+        
+        if (response.success) {
+          apiSuggestions.value = response.data
+          console.log('設定 apiSuggestions:', apiSuggestions.value)
+        }
+      } catch (error) {
+        console.error('獲取搜尋建議失敗:', error)
+        apiSuggestions.value = []
+      }
+    }, props.searchDelay)
+  } else if (value.trim().length < 2) {
+    console.log('輸入長度不足 2，清空建議')
+    // 清空 API 建議
+    apiSuggestions.value = []
+  }
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    emit('search', props.modelValue)
+    showDropdown.value = false
+    inputRef.value?.blur()
+  }
 }
 
 const handleBlur = () => {
@@ -155,6 +247,7 @@ const selectSuggestion = (suggestion: SearchSuggestion) => {
   
   emit('update:modelValue', suggestion.title)
   emit('select', suggestion)
+  emit('search', suggestion.title)
   showDropdown.value = false
   inputRef.value?.blur()
 }
@@ -165,4 +258,11 @@ function highlightMatch(text: string, keyword: string) {
   const parts = text.split(regex)
   return parts.map(part => ({ text: part, match: part.toLowerCase() === keyword.toLowerCase() }))
 }
+
+// 清理計時器
+onUnmounted(() => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value)
+  }
+})
 </script>
