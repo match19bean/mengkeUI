@@ -60,6 +60,7 @@ export default {
       fontFamily: {
         primary: ['Noto Sans TC', 'sans-serif'],
         secondary: ['Gen Jyuu Gothic XP', 'serif'],
+        genyogothic: ['GenYoGothic TW', 'sans-serif'],
       },
       fontSize: {
         'h1': '40px',
