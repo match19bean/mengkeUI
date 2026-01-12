@@ -1,33 +1,34 @@
 <template>
-  <div class="relative inline-block w-full">
-    <label v-if="label" class="block text-subtitle text-brown-1 font-medium mb-1">{{ label }}</label>
+  <div class="relative inline-block w-full" ref="dropdownRef">
     <div
       :class="selectClasses"
       @click="toggleDropdown"
+      tabindex="0"
+      @blur="handleBlur"
     >
-      <span class="text-body text-brown-1">{{ displayValue }}</span>
+      <span :class="displayTextClasses">{{ displayValue }}</span>
       <svg
         :class="iconClasses"
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
         fill="none"
       >
         <path
-          d="M4 6L8 10L12 6"
+          d="M3 4.5L6 7.5L9 4.5"
           stroke="currentColor"
-          stroke-width="2"
+          stroke-width="1.5"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
       </svg>
     </div>
-    <div v-if="isOpen && !disabled" class="absolute top-full mt-1 left-0 right-0 bg-white border border-brown-6 rounded-sm shadow-lg max-h-50 overflow-y-auto z-50">
+    <div v-if="isOpen && !disabled" class="absolute top-full mt-2 left-0 right-0 bg-[#F8F7F0] rounded-2xl shadow-lg max-h-60 overflow-y-auto z-50 py-2">
       <div
         v-for="option in options"
         :key="option.value"
         :class="getItemClasses(option)"
-        @click="selectOption(option)"
+        @mousedown.prevent="selectOption(option)"
       >
         {{ option.label }}
       </div>
@@ -46,14 +47,15 @@ interface Option {
 interface Props {
   modelValue?: string | number
   options: Option[]
-  label?: string
   placeholder?: string
   disabled?: boolean
+  error?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: '請選擇',
-  disabled: false
+  disabled: false,
+  error: false
 })
 
 const emit = defineEmits<{
@@ -61,35 +63,42 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
 
 const displayValue = computed(() => {
   const selected = props.options.find(opt => opt.value === props.modelValue)
   return selected ? selected.label : props.placeholder
 })
 
+const displayTextClasses = computed(() => {
+  const isPlaceholder = !props.options.find(opt => opt.value === props.modelValue)
+  return isPlaceholder ? 'text-xs text-[#36201080] font-black tracking-[2px]' : 'text-xs text-brown-1 tracking-[2px]'
+})
+
 const selectClasses = computed(() => {
-  const baseClasses = 'flex items-center justify-between px-3 py-2.5 bg-white border rounded-sm cursor-pointer transition-all duration-250'
-  const normalClasses = 'border-brown-6 hover:border-brown-5'
-  const openClasses = 'border-secondary-1 ring-4 ring-secondary-1/10'
-  const disabledClasses = 'bg-brown-9 cursor-not-allowed opacity-60'
+  const baseClasses = 'flex items-center justify-between h-[32px] px-4 bg-[#36201019] rounded-[32px] cursor-pointer transition-all duration-250'
+  const normalClasses = 'hover:bg-[#36201026] border-0'
+  const openClasses = 'bg-[#36201026] border-0'
+  const errorClasses = 'border border-alert-1'
+  const disabledClasses = 'bg-brown-9 cursor-not-allowed opacity-60 border-0'
   
   return [
     baseClasses,
-    props.disabled ? disabledClasses : (isOpen.value ? openClasses : normalClasses)
+    props.disabled ? disabledClasses : props.error ? errorClasses : (isOpen.value ? openClasses : normalClasses)
   ].filter(Boolean).join(' ')
 })
 
 const iconClasses = computed(() => {
-  const baseClasses = 'transition-transform duration-250 text-brown-5'
+  const baseClasses = 'transition-transform duration-250 text-brown-6'
   const rotateClasses = isOpen.value ? 'rotate-180' : ''
   
   return [baseClasses, rotateClasses].filter(Boolean).join(' ')
 })
 
 const getItemClasses = (option: Option) => {
-  const baseClasses = 'px-3 py-2.5 text-body text-brown-1 cursor-pointer transition-colors duration-150'
-  const hoverClasses = 'hover:bg-brown-9'
-  const selectedClasses = option.value === props.modelValue ? 'bg-secondary-4 font-semibold' : ''
+  const baseClasses = 'px-4 py-2.5 text-xs text-brown-1 cursor-pointer transition-colors duration-150 text-center tracking-[2px]'
+  const hoverClasses = 'hover:bg-[#36201019]'
+  const selectedClasses = option.value === props.modelValue ? 'bg-[#36201019] font-semibold' : ''
   
   return [baseClasses, hoverClasses, selectedClasses].filter(Boolean).join(' ')
 }
@@ -103,6 +112,13 @@ const toggleDropdown = () => {
 const selectOption = (option: Option) => {
   emit('update:modelValue', option.value)
   isOpen.value = false
+}
+
+const handleBlur = (event: FocusEvent) => {
+  // 延遲關閉以允許點擊選項
+  setTimeout(() => {
+    isOpen.value = false
+  }, 200)
 }
 
 const closeDropdown = (event: MouseEvent) => {

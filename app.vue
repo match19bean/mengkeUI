@@ -3,7 +3,7 @@
     <!-- 左側功能列 -->
     <BaseSidebar 
       v-if="!hideSidebar"
-      user-name="訪客模式"
+      :user-name="displayName"
       :current-path="currentPath"
       user-avatar=""
       :menu-items="sidebarMenuItems"
@@ -11,6 +11,9 @@
       class="flex-shrink-0"
       style="flex-basis: clamp(270px, 15%, 400px);"
     />
+    
+    <!-- 漸層分隔線 -->
+    <div v-if="!hideSidebar" class="w-[1px] opacity-50" style="background: linear-gradient(to bottom, #501C1C00, #432C2C 50%, #501C1C00);"></div>
 
     <!-- 主要內容區 -->
     <main class="flex-1 overflow-y-auto h-screen">
@@ -20,13 +23,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
+const { user, isAuthenticated, initAuth } = useAuth()
 
 const currentPath = computed(() => route.path)
 const hideSidebar = computed(() => ['/login', '/signup'].includes(route.path))
+
+const displayName = computed(() => {
+  if (isAuthenticated.value && user.value) {
+    return user.value.nickname || user.value.account
+  }
+  return '訪客模式'
+})
+
+// 初始化認證狀態
+onMounted(() => {
+  initAuth()
+})
 
 const sidebarMenuItems = [
   {

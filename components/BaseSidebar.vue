@@ -1,5 +1,5 @@
 <template>
-  <aside class="w-auto bg-cream border-r border-brown-8 flex flex-col h-screen">
+  <aside class="w-auto bg-cream flex flex-col h-screen">
     <!-- 產品 LOGO -->
     <div class="pt-6">
       <button @click="$emit('navigate', '/')" class="flex items-center justify-center w-full hover:opacity-80 transition-opacity">
@@ -63,7 +63,7 @@
 
             <!-- 子選單 -->
             <transition name="submenu">
-                <div v-if="isMenuExpanded(item.name)" class="ml-4 mt-1 space-y-1">
+                <div v-if="isMenuExpanded(item.name)" class="ml-8 mt-1 space-y-1">
                 <button
                     v-for="child in item.children"
                     :key="child.name"
@@ -97,23 +97,25 @@
             <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" class="flex-shrink-0">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
             </svg>
-            <span class="flex-1 text-left font-semibold text-subtitle">{{ item.name }}</span>
+            <span class="flex-1 font-primary text-left text-subtitle">{{ item.name }}</span>
             <img v-if="item.locked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
             </button>
         </template>
         
         <!-- 與專屬CAT聯繫按鈕 -->
-        <div class="px-4 py-4 border-t border-brown-8">
+        
+        <!-- 漸淡分隔線 -->
+        <div class="h-[1px] mx-8 my-5 opacity-50" style="background: linear-gradient(to right, #501C1C00, #432C2C 50%, #501C1C00);"></div>
+
         <button
             @click="$emit('navigate', '/cat-lesson')"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:text-brown-1 hover:bg-brown-9 transition-colors"
             :class="{ 'pointer-events-none': catLessonLocked }"
             style="color: #2422208F"
         >
-            <span class="flex-1 text-left text-subtitle">與專屬CAT聯繫</span>
+            <span class="flex-1 text-left text-subtitle font-primary">與專屬CAT聯繫</span>
             <img v-if="catLessonLocked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
         </button>
-        </div>
     </nav>    
 
     <!-- 底部區塊：進行學習任務 -->

@@ -29,12 +29,12 @@
           <div>
             <label class="block text-primary-1 text-[20px] font-black mb-2 py-2">帳號</label>
             <BaseInput
-              v-model="form.email"
-              type="email"
+              v-model="form.account"
+              type="text"
               placeholder="請輸入帳號"
-              :error="errors.email"
-              :error-message="errors.emailMessage"
-              textSize="text-[20px]"
+              :error="errors.account"
+              :error-message="errors.accountMessage"
+              textSize="text-[22px]"
               textAlign="center"
               textColor="text-[#F8F7F0]"
               bgColor="bg-[#EE795959]"
@@ -93,9 +93,15 @@
             <button
               @click="handleLogin"
               type="button"
-              class="w-full h-[60px] px-[22px] py-2 bg-[#F8F7F0] text-primary-1 rounded-3xl font-black text-[28px] flex items-center justify-center hover:bg-white transition-all duration-250"
+              :disabled="isLoading"
+              :class="[
+                'w-full h-[60px] px-[22px] py-2 rounded-3xl font-black text-[28px] flex items-center justify-center transition-all duration-250',
+                isLoading 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-[#F8F7F0] text-primary-1 hover:bg-white'
+              ]"
             >
-              登入
+              {{ isLoading ? '登入中...' : '登入' }}
             </button>
             
             <!-- LINE 登入按鈕 -->
@@ -111,7 +117,12 @@
 
             <!-- 底部連結 -->
             <div class="flex items-center justify-end gap-6 text-sm pt-[16px]">
-              <NuxtLink to="/signup" class="text-white hover:text-[#F8F7F0] font-medium">免費註冊</NuxtLink>
+              <button 
+                @click="showSignup = true"
+                class="text-white hover:text-[#F8F7F0] font-medium cursor-pointer bg-transparent border-none"
+              >
+                免費註冊
+              </button>
               <a href="#" class="text-white/80 hover:text-white">忘記密碼</a>
             </div>
 
@@ -130,29 +141,41 @@
 
       
     </div>
+
+    <!-- 註冊彈窗 -->
+    <SignupPopup 
+      v-model="showSignup" 
+      @complete="handleSignupComplete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const showSignup = ref(false)
+const { login } = useAuth()
+const router = useRouter()
+
 const form = ref({
-  email: '',
+  account: '',
   password: ''
 })
 
 const errors = ref({
-  email: false,
-  emailMessage: '',
+  account: false,
+  accountMessage: '',
   password: false,
   passwordMessage: ''
 })
 
-const handleLogin = () => {
+const isLoading = ref(false)
+
+const handleLogin = async () => {
   // 重置錯誤
   errors.value = {
-    email: false,
-    emailMessage: '',
+    account: false,
+    accountMessage: '',
     password: false,
     passwordMessage: ''
   }
@@ -160,9 +183,9 @@ const handleLogin = () => {
   // 簡單驗證
   let hasError = false
 
-  if (!form.value.email) {
-    errors.value.email = true
-    errors.value.emailMessage = '請輸入帳號'
+  if (!form.value.account) {
+    errors.value.account = true
+    errors.value.accountMessage = '請輸入帳號'
     hasError = true
   }
 
@@ -174,7 +197,31 @@ const handleLogin = () => {
 
   if (hasError) return
 
-  // 這裡處理登入邏輯
-  console.log('登入資料:', form.value)
+  // 呼叫登入 API
+  isLoading.value = true
+  
+  try {
+    const result = await login({
+      account: form.value.account,
+      password: form.value.password
+    })
+
+    if (result.success) {
+      router.push('/')
+    } else {
+      // 顯示錯誤訊息
+      alert(result.message || '登入失敗')
+    }
+  } catch (error) {
+    console.error('登入錯誤:', error)
+    alert('登入失敗，請稍後再試')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleSignupComplete = (data: any) => {
+  console.log('註冊完成:', data)
+  // 這裡可以處理註冊完成後的邏輯，例如自動登入或顯示成功訊息
 }
 </script>

@@ -1,10 +1,6 @@
 <template>
   <div class="relative w-full">
-    <!-- Debug 信息 -->
-    <div style="position: fixed; top: 10px; right: 10px; background: yellow; padding: 5px; z-index: 9999; font-size: 12px;">
-      useApi: {{ useApi }}
-    </div>
-    
+   
     <div class="relative">
       <!-- 搜尋圖示 -->
       <div class="absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -27,12 +23,10 @@
         :class="[
           'w-[460px] h-[50px] pl-16 pr-6 bg-white',
           'text-body text-brown-1 placeholder:text-brown-5',
-          'border-2 transition-all duration-200',
+          'border-2 rounded-[50px] transition-all duration-200',
           disabled 
             ? 'border-transparent text-brown-6 cursor-not-allowed opacity-60'
-            : showDropdown && filteredSuggestions.length > 0
-              ? 'rounded-t-[50px] border-transparent hover:border-brown-8 focus:border-brown-2 focus:outline-none'
-              : 'rounded-[50px] border-transparent hover:border-brown-8 focus:border-brown-2 focus:outline-none'
+            : 'border-transparent hover:border-brown-8 focus:border-brown-2 focus:outline-none'
         ]"
       />
 
@@ -48,7 +42,7 @@
     <!-- 下拉建議列表 -->
     <div
       v-if="showDropdown && filteredSuggestions.length > 0"
-      class="absolute w-[460px] bg-cream rounded-b-[16px] border-2 border-t-0 border-brown-2 shadow-lg overflow-hidden z-10"
+      class="absolute w-[460px] bg-white rounded-[16px] shadow-lg overflow-hidden z-10"
     >
       <div class="max-h-[280px] w-[460px] overflow-y-auto">
         <button
@@ -242,12 +236,31 @@ const handleBlur = () => {
   }, 200)
 }
 
-const selectSuggestion = (suggestion: SearchSuggestion) => {
+const selectSuggestion = async (suggestion: SearchSuggestion) => {
   if (suggestion.disabled) return
   
   emit('update:modelValue', suggestion.title)
   emit('select', suggestion)
   emit('search', suggestion.title)
+  
+  // 如果使用 API，选择后重新查询
+  if (props.useApi && searchStore && suggestion.title.trim().length >= 2) {
+    try {
+      const response = await searchStore.getSearchSuggestions({
+        query: suggestion.title,
+        limit: 5
+      })
+      
+      if (response.success) {
+        apiSuggestions.value = response.data
+        showDropdown.value = true
+        return
+      }
+    } catch (error) {
+      console.error('重新获取搜索建议失败:', error)
+    }
+  }
+  
   showDropdown.value = false
   inputRef.value?.blur()
 }

@@ -4,7 +4,8 @@ import type { SearchSuggestionsParams, SearchResult, SearchSuggestionsData } fro
  * 搜尋功能的 composable
  */
 export const useSearchStore = () => {
-  const API_BASE = 'http://143.198.93.171/api'
+  const config = useRuntimeConfig()
+  const API_BASE = config.public.apiBase
   
   // 使用 useState 保存搜尋建議
   const suggestions = useState<string[]>('search-suggestions', () => [])
