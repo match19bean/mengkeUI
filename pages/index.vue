@@ -82,10 +82,10 @@
                 </BaseTypography>
                 <NuxtLink
                   to="/club"
-                  class="flex items-center gap-10 px-4 py-2 border-[1.5px] border-brown-1 rounded-[12px] text-brown-1 text-button-s font-semibold hover:bg-brown-9/30 transition-colors"
+                  class="w-[135px] flex items-center justify-between px-4 py-2 border-[1.5px] border-brown-1 rounded-[12px] text-brown-1 text-button-s font-semibold hover:bg-brown-9/30 transition-colors"
                 >
-                  <span class="font-extrabold">聚樂部</span>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <span class="font-extrabold flex-1 text-center">聚樂部</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
                     <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </NuxtLink>
@@ -134,30 +134,6 @@
         </aside>
       </div>
     </div>
-
-    <!-- 登出確認彈窗 -->
-    <Teleport to="body">
-      <Transition name="fade">
-        <div v-if="showLogoutPopup" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div class="bg-[#F8F7F0] rounded-3xl p-8 shadow-popup min-w-[320px] text-center relative">
-            <button 
-              class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-brown-9 text-brown-3 cursor-pointer transition" 
-              @click="cancelLogout"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                <path d="M6 6l8 8M14 6l-8 8" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <h2 class="text-2xl font-bold mb-4 text-brown-1">確認登出</h2>
-            <p class="text-base text-brown-2 mb-6">確定要登出嗎？</p>
-            <div class="flex gap-3 justify-center">
-              <BaseButton variant="secondary" size="medium" @click="cancelLogout">取消</BaseButton>
-              <BaseButton variant="primary" size="medium" @click="confirmLogout">確認登出</BaseButton>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
@@ -180,7 +156,6 @@ interface CarouselItem {
 type FrequencyCardValue = number | string
 
 const searchQuery = ref('')
-const showLogoutPopup = ref(false)
 
 // 搜尋處理函數
 const handleSearch = (query: string) => {
@@ -189,21 +164,10 @@ const handleSearch = (query: string) => {
   // navigateTo(`/search?q=${encodeURIComponent(query)}`)
 }
 
-// 顯示登出確認彈窗
+// 登出處理函數
 const handleLogout = () => {
-  showLogoutPopup.value = true
-}
-
-// 確認登出
-const confirmLogout = () => {
   logout()
-  showLogoutPopup.value = false
-  router.push('/')
-}
-
-// 取消登出
-const cancelLogout = () => {
-  showLogoutPopup.value = false
+  router.push('/login')
 }
 
 const statsItems = [

@@ -17,7 +17,7 @@
 
       <!-- 右側 - 登入表單 -->
       <div class="flex w-1/3  items-center justify-center p-8 bg-brown-10">
-      <div class="w-full max-w-md px-10">
+      <div class="w-full px-8">
         <!-- 標題和吉祥物 -->
         <div class="flex justify-center mb-6">
           <img src="/images/theo-waving.png" alt="吉祥物" class="w-full h-auto object-contain">
@@ -32,12 +32,15 @@
               v-model="form.account"
               type="text"
               placeholder="請輸入帳號"
-              :error="errors.account"
-              :error-message="errors.accountMessage"
-              textSize="text-[22px]"
+              height="h-[50px]"
+              placeholderSize="text-[20px]"
+              placeholderColor="text-[#F8F7F0]"             
+              textSize="text-[20px]"
               textAlign="center"
               textColor="text-[#F8F7F0]"
               bgColor="bg-[#EE795959]"
+              :error="errors.account"
+              :error-message="errors.accountMessage"
             />
           </div>
 
@@ -48,12 +51,15 @@
               v-model="form.password"
               type="password"
               placeholder="請輸入密碼"
-              :error="errors.password"
-              :error-message="errors.passwordMessage"
+              height="h-[50px]"
+              placeholderSize="text-[20px]"
+              placeholderColor="text-[#F8F7F0]"
               textSize="text-[20px]"
               textAlign="center"
               textColor="text-[#F8F7F0]"
               bgColor="bg-[#EE795959]"
+              :error="errors.password"
+              :error-message="errors.passwordMessage"
             />
           </div>
         </form>

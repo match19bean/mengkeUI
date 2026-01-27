@@ -10,6 +10,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :class="inputClasses"
+      :style="placeholderStyle"
       @input="handleInput"
       @blur="handleBlur"
       class="rounded-full"
@@ -29,11 +30,13 @@ interface Props {
   errorMessage?: string
   disabled?: boolean
   width?: string
+  height?: string
   bgColor?: string
   textAlign?: 'left' | 'center' | 'right'
   textColor?: string
   textSize?: string
   placeholderSize?: string
+  placeholderColor?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,11 +45,13 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   error: false,
   width: 'w-full',
+  height: 'h-[32px]',
   bgColor: 'bg-[#36201019]',
   textAlign: 'left',
   textColor: 'text-brown-1',
   textSize: 'text-base',
-  placeholderSize: 'text-xs'
+  placeholderSize: 'text-xs',
+  placeholderColor: 'text-brown-6'
 })
 
 const emit = defineEmits<{
@@ -63,7 +68,7 @@ const inputValue = computed({
 
 const inputClasses = computed(() => {
   const textAlignClass = props.textAlign === 'center' ? 'text-center' : props.textAlign === 'right' ? 'text-right' : 'text-left'
-  const baseClasses = `${props.width} h-[32px] px-4 ${props.textSize} font-primary rounded-[32px] ${props.bgColor} ${textAlignClass} ${props.textColor} transition-all duration-200 placeholder:${props.placeholderSize} placeholder:text-brown-6 placeholder:tracking-[2px] flex items-center`
+  const baseClasses = `${props.width} ${props.height} px-4 ${props.textSize} font-primary rounded-[32px] ${props.bgColor} ${textAlignClass} ${props.textColor} transition-all duration-200 flex items-center`
   const normalClasses = 'border-0 focus:outline-none focus:ring-2 focus:ring-secondary-1/30'
   const errorClasses = 'border border-alert-1 focus:ring-alert-1/30 text-alert-1'
   const disabledClasses = 'bg-brown-9 cursor-not-allowed opacity-60'
@@ -75,6 +80,32 @@ const inputClasses = computed(() => {
   ].filter(Boolean).join(' ')
 })
 
+const placeholderStyle = computed(() => {
+  const colorMap: Record<string, string> = {
+    'text-[#F8F7F0]': '#F8F7F0',
+    'text-brown-6': '#A89A8D',
+    'text-gray-400': '#9CA3AF'
+  }
+  
+  const sizeMap: Record<string, string> = {
+    'text-xs': '0.75rem',
+    'text-sm': '0.875rem',
+    'text-base': '1rem',
+    'text-lg': '1.125rem',
+    'text-xl': '1.25rem',
+    'text-[20px]': '20px',
+    'text-[22px]': '22px'
+  }
+  
+  const color = colorMap[props.placeholderColor] || '#A89A8D'
+  const size = sizeMap[props.placeholderSize] || '0.75rem'
+  
+  return {
+    '--placeholder-color': color,
+    '--placeholder-size': size
+  }
+})
+
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement
   emit('update:modelValue', target.value)
@@ -84,3 +115,11 @@ const handleBlur = (event: FocusEvent) => {
   emit('blur', event)
 }
 </script>
+
+<style scoped>
+input::placeholder {
+  color: var(--placeholder-color);
+  font-size: var(--placeholder-size);
+  letter-spacing: 0.125rem; /* tracking-[2px] */
+}
+</style>

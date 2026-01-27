@@ -6,7 +6,7 @@
       tabindex="0"
       @blur="handleBlur"
     >
-      <span :class="displayTextClasses">{{ displayValue }}</span>
+      <span :class="displayTextClasses" class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ displayValue }}</span>
       <svg
         :class="iconClasses"
         width="12"
@@ -45,34 +45,47 @@ interface Option {
 }
 
 interface Props {
-  modelValue?: string | number
+  modelValue?: string | number | (string | number)[]
   options: Option[]
   placeholder?: string
   disabled?: boolean
   error?: boolean
+  multiple?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: '請選擇',
   disabled: false,
-  error: false
+  error: false,
+  multiple: false
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number]
+  'update:modelValue': [value: string | number | (string | number)[]]
 }>()
 
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
 const displayValue = computed(() => {
-  const selected = props.options.find(opt => opt.value === props.modelValue)
-  return selected ? selected.label : props.placeholder
+  if (props.multiple) {
+    const values = Array.isArray(props.modelValue) ? props.modelValue : []
+    if (values.length === 0) return props.placeholder
+    const selectedLabels = props.options
+      .filter(opt => values.includes(opt.value))
+      .map(opt => opt.label)
+    return selectedLabels.join(', ')
+  } else {
+    const selected = props.options.find(opt => opt.value === props.modelValue)
+    return selected ? selected.label : props.placeholder
+  }
 })
 
 const displayTextClasses = computed(() => {
-  const isPlaceholder = !props.options.find(opt => opt.value === props.modelValue)
-  return isPlaceholder ? 'text-xs text-[#36201080] font-black tracking-[2px]' : 'text-xs text-brown-1 tracking-[2px]'
+  const hasValue = props.multiple 
+    ? (Array.isArray(props.modelValue) && props.modelValue.length > 0)
+    : props.options.find(opt => opt.value === props.modelValue)
+  return hasValue ? 'text-xs text-brown-1 tracking-[2px]' : 'text-xs text-[#36201080] font-black tracking-[2px]'
 })
 
 const selectClasses = computed(() => {
@@ -98,9 +111,17 @@ const iconClasses = computed(() => {
 const getItemClasses = (option: Option) => {
   const baseClasses = 'px-4 py-2.5 text-xs text-brown-1 cursor-pointer transition-colors duration-150 text-center tracking-[2px]'
   const hoverClasses = 'hover:bg-[#36201019]'
-  const selectedClasses = option.value === props.modelValue ? 'bg-[#36201019] font-semibold' : ''
+  const selectedClasses = isSelected(option) ? 'bg-[#36201019] font-semibold' : ''
   
   return [baseClasses, hoverClasses, selectedClasses].filter(Boolean).join(' ')
+}
+
+const isSelected = (option: Option) => {
+  if (props.multiple) {
+    const values = Array.isArray(props.modelValue) ? props.modelValue : []
+    return values.includes(option.value)
+  }
+  return option.value === props.modelValue
 }
 
 const toggleDropdown = () => {
@@ -110,8 +131,19 @@ const toggleDropdown = () => {
 }
 
 const selectOption = (option: Option) => {
-  emit('update:modelValue', option.value)
-  isOpen.value = false
+  if (props.multiple) {
+    const values = Array.isArray(props.modelValue) ? [...props.modelValue] : []
+    const index = values.indexOf(option.value)
+    if (index > -1) {
+      values.splice(index, 1)
+    } else {
+      values.push(option.value)
+    }
+    emit('update:modelValue', values)
+  } else {
+    emit('update:modelValue', option.value)
+    isOpen.value = false
+  }
 }
 
 const handleBlur = (event: FocusEvent) => {
