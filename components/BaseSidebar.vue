@@ -75,8 +75,8 @@
                     ]"
                     :style="child.path !== currentPath ? 'color: #2422208F' : ''"
                 >
-                    <span class="flex-1 text-left text-caption">{{ child.name }}</span>
-                    <img v-if="child.locked" src="/images/sidebar-lock.svg" alt="locked" width="16" height="16" class="flex-shrink-0" />
+                    <span class="flex-1 text-left text-subtitle">{{ child.name }}</span>
+                    <img v-if="child.locked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
                 </button>
                 </div>
             </transition>
@@ -136,7 +136,7 @@
           :class="learningTaskLocked ? 'opacity-75' : 'hover:bg-brown-9'"
         >
           <span class="text-center text-subtitle">進行學習任務</span>
-          <img v-if="learningTaskLocked" src="/images/sidebar-lock.svg" alt="locked" width="14" height="16" class="flex-shrink-0" />
+          <img v-if="learningTaskLocked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
         </button>
       </div>
     </div>

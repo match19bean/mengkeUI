@@ -141,14 +141,11 @@ const searchStore = props.useApi ? useSearchStore() : null
 
 // Debug: 在組件掛載時輸出 props
 onMounted(() => {
-  console.log('BaseSearchInput mounted, useApi:', props.useApi)
-  console.log('searchStore:', searchStore)
+
+  
 })
 
 const filteredSuggestions = computed(() => {
-  console.log('計算 filteredSuggestions, modelValue:', props.modelValue)
-  console.log('useApi:', props.useApi)
-  console.log('apiSuggestions:', apiSuggestions.value)
   
   if (!props.modelValue) return []
   
@@ -160,7 +157,6 @@ const filteredSuggestions = computed(() => {
       badgeColor: undefined,
       disabled: false
     } as SearchSuggestion))
-    console.log('返回 API 建議:', result)
     return result
   }
   
@@ -168,7 +164,6 @@ const filteredSuggestions = computed(() => {
   const localResult = props.suggestions.filter(suggestion =>
     suggestion.title.toLowerCase().includes(props.modelValue.toLowerCase())
   )
-  console.log('返回本地建議:', localResult)
   return localResult
 })
 
@@ -177,11 +172,8 @@ const handleInput = (event: Event) => {
   emit('update:modelValue', value)
   showDropdown.value = true
 
-  console.log('handleInput 被觸發, value:', value, 'useApi:', props.useApi)
-
   // 如果使用 API，延遲獲取建議
   if (props.useApi && value.trim().length >= 2) {
-    console.log('準備呼叫 API...')
     
     // 清除之前的計時器
     if (searchTimeout.value) {
@@ -190,10 +182,8 @@ const handleInput = (event: Event) => {
 
     // 設置新的計時器
     searchTimeout.value = setTimeout(async () => {
-      console.log('開始呼叫 API, searchStore:', searchStore)
       
       if (!searchStore) {
-        console.error('searchStore 未初始化')
         return
       }
       
@@ -203,19 +193,15 @@ const handleInput = (event: Event) => {
           limit: 5
         })
         
-        console.log('API 回應:', response)
         
         if (response.success) {
           apiSuggestions.value = response.data
-          console.log('設定 apiSuggestions:', apiSuggestions.value)
         }
       } catch (error) {
-        console.error('獲取搜尋建議失敗:', error)
         apiSuggestions.value = []
       }
     }, props.searchDelay)
   } else if (value.trim().length < 2) {
-    console.log('輸入長度不足 2，清空建議')
     // 清空 API 建議
     apiSuggestions.value = []
   }
@@ -257,7 +243,6 @@ const selectSuggestion = async (suggestion: SearchSuggestion) => {
         return
       }
     } catch (error) {
-      console.error('重新获取搜索建议失败:', error)
     }
   }
   

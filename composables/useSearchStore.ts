@@ -55,7 +55,6 @@ export const useSearchStore = () => {
   const getSearchSuggestions = async (params: SearchSuggestionsParams) => {
     pending.value = true
 
-    console.log('Fetching search suggestions for query:', params.query)
     try {
       const response = await $fetch<SearchResult<SearchSuggestionsData>>(
         `${API_BASE}/search/suggestions`,
@@ -66,15 +65,12 @@ export const useSearchStore = () => {
           }
         }
       )
-
-      console.log('API 原始回應:', response)
       
       if (response.success && response.data) {
         // 提取建議
         const extractedSuggestions = extractSuggestions(response.data)
         suggestions.value = extractedSuggestions
         
-        console.log('提取的建議:', extractedSuggestions)
 
         return {
           success: true,
@@ -87,7 +83,6 @@ export const useSearchStore = () => {
         data: []
       }
     } catch (error) {
-      console.error('搜尋建議 API 錯誤:', error)
       suggestions.value = []
       return {
         success: false,

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-cream rounded-[24px] p-4 shadow-card border border-brown-8 min-w-[340px] max-w-[420px] w-auto h-auto relative flex flex-col">
+  <div class="bg-cream rounded-[24px] p-4 shadow-card border border-brown-8 w-[400px] h-auto relative flex flex-col">
     <!-- 月份選擇器 -->
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2">
@@ -77,11 +77,16 @@
         >
           <span v-if="day.date">{{ day.isHoliday ? '休' : day.date }}</span>
         </div>
-        <!-- 課程標記點點 -->
-        <div v-if="day.hasCourse && day.isCurrentMonth" class="absolute top-0 left-1/2 -translate-x-1/2 flex gap-0.5">
-          <div class="w-1 h-1 rounded-full bg-complementary-1"></div>
-          <div class="w-1 h-1 rounded-full bg-secondary-1"></div>
+        <!-- 標記：諮商(黃) 與 俱樂部(綠) — 今天不顯示小點；根據點數調整水平偏移量 -->
+        <div
+          v-if="(day.hasCounseling || day.hasClub) && day.isCurrentMonth && !day.isToday"
+          :class="[ 'absolute top-0 left-1/2 flex gap-0.5', (day.hasCounseling && day.hasClub) ? '-translate-x-2' : '-translate-x-1' ]"
+        >
+          <div v-if="day.hasCounseling" class="w-1 h-1 rounded-full bg-complementary-1"></div>
+          <div v-if="day.hasClub" class="w-1 h-1 rounded-full bg-secondary-1"></div>
         </div>
+        <!-- 使用者自己的事件（小紅點，右上角） - 只在「今天」且為瀏覽模式顯示 -->
+        <div v-if="day.hasUserEvent && day.isCurrentMonth && day.isToday && (!props.modelValue || props.readonly)" class="absolute top-0 right-0 w-3 h-3 rounded-full bg-alert-1 ring-2 ring-white"></div>
       </div>
     </div>
   </div>
@@ -96,21 +101,27 @@ interface CalendarDay {
   isToday: boolean
   isHoliday: boolean
   isSelected: boolean
-  hasCourse: boolean
+  hasCounseling: boolean
+  hasClub: boolean
+  hasUserEvent: boolean
 }
 
 interface Props {
   modelValue?: Date
   holidays?: Date[] // 休息日的完整日期陣列
   today?: Date // 當天日期（綠色背景）
-  courseDates?: Date[] // 有課程的日期陣列
+  counselingDates?: Date[] // 有諮商的日期（黃色）
+  clubDates?: Date[] // 有俱樂部的日期（綠色）
+  userEvents?: Date[] // 使用者自己的課程/俱樂部（顯示紅點）
   readonly?: boolean // 是否為唯讀模式（純顯示）
 }
 
 const props = withDefaults(defineProps<Props>(), {
   holidays: () => [],
   today: () => new Date(),
-  courseDates: () => [],
+  counselingDates: () => [],
+  clubDates: () => [],
+  userEvents: () => [],
   readonly: false
 })
 
@@ -155,7 +166,9 @@ const calendarDays = computed(() => {
       isToday: false,
       isHoliday: false,
       isSelected: false,
-      hasCourse: false
+      hasCounseling: false,
+      hasClub: false,
+      hasUserEvent: false
     })
   }
   
@@ -171,11 +184,21 @@ const calendarDays = computed(() => {
              holiday.getMonth() === month && 
              holiday.getFullYear() === year
     })
-    const hasCourse = props.courseDates.some(courseDate => {
-      return courseDate.getDate() === i && 
-             courseDate.getMonth() === month && 
-             courseDate.getFullYear() === year
-    })    
+    const hasCounseling = props.counselingDates.some(d => {
+      return d.getDate() === i &&
+             d.getMonth() === month &&
+             d.getFullYear() === year
+    })
+    const hasClub = props.clubDates.some(d => {
+      return d.getDate() === i &&
+             d.getMonth() === month &&
+             d.getFullYear() === year
+    })
+    const hasUserEvent = props.userEvents.some(d => {
+      return d.getDate() === i &&
+             d.getMonth() === month &&
+             d.getFullYear() === year
+    })
     // 判斷是否為選中的日期
     const isSelected = !!(props.modelValue &&
       props.modelValue.getDate() === i &&
@@ -187,7 +210,9 @@ const calendarDays = computed(() => {
       isToday,
       isHoliday,
       isSelected,
-      hasCourse
+      hasCounseling,
+      hasClub,
+      hasUserEvent
     })
   }
   
@@ -200,7 +225,9 @@ const calendarDays = computed(() => {
       isToday: false,
       isHoliday: false,
       isSelected: false,
-      hasCourse: false
+      hasCounseling: false,
+      hasClub: false,
+      hasUserEvent: false
     })
   }
   

@@ -5,8 +5,10 @@
       v-if="!hideSidebar"
       :user-name="displayName"
       :current-path="currentPath"
-      user-avatar=""
+        :user-avatar="user?.value?.avatar || ''"
       :menu-items="sidebarMenuItems"
+      :cat-lesson-locked="catLessonLocked"
+      :learning-task-locked="learningTaskLocked"
       @navigate="handleNavigate"
       class="flex-shrink-0"
       style="flex-basis: clamp(270px, 15%, 400px);"
@@ -27,13 +29,16 @@ import { computed, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
-const { user, isAuthenticated, initAuth } = useAuth()
+// call useAuth() safely — if it's unavailable during init (e.g. SSR),
+// provide fallbacks so `.value` access won't throw
+const _auth = (typeof useAuth === 'function' ? useAuth() : null) ?? { user: ref(null), isAuthenticated: ref(false), initAuth: () => {} }
+const { user, isAuthenticated, initAuth } = _auth
 
 const currentPath = computed(() => route.path)
 const hideSidebar = computed(() => ['/login', '/signup'].includes(route.path))
 
 const displayName = computed(() => {
-  if (isAuthenticated.value && user.value) {
+  if (isAuthenticated?.value && user?.value) {
     return user.value.nickname || user.value.account
   }
   return '訪客模式'
@@ -44,21 +49,32 @@ onMounted(() => {
   initAuth()
 })
 
-const sidebarMenuItems = [
-  {
-    name: '主界面',
-    path: '/',
-    expandable: true,
-    children: [
-      { name: '聚樂部', path: '/club', locked: false },
-      { name: '反轉學習', path: '/flipped-learning', locked: true },
-      { name: 'MK大廳', path: '/mk-lobby', locked: false }
-    ]
-  },
-  { name: '個人資料', path: '/profile', icon: '/images/file.svg' },
-  { name: '學習諮商室', path: '/consultation', icon: '/images/user-group.svg', locked: true },
-  { name: '設定', path: '/settings', icon: '/images/setting-01.svg' }
-]
+const catLessonLocked = computed(() => {
+  return !isAuthenticated.value
+})
+
+const learningTaskLocked = computed(() => {
+  return !isAuthenticated.value
+})
+
+const sidebarMenuItems = computed(() => {
+  const logged = !!isAuthenticated?.value
+  return [
+    {
+      name: '主界面',
+      path: '/',
+      expandable: true,
+      children: [
+        { name: '聚樂部', path: '/club', locked: false },
+        { name: '反轉學習', path: '/flipped-learning', locked: !logged },
+        { name: 'MK大廳', path: '/mk-lobby', locked: false }
+      ]
+    },
+    { name: '個人資料', path: '/profile', icon: '/images/file.svg', locked: !logged },
+    { name: '學習諮商室', path: '/consultation', icon: '/images/user-group.svg', locked: !logged },
+    { name: '設定', path: '/settings', icon: '/images/setting-01.svg' }
+  ]
+})
 
 const handleNavigate = (path: string) => {
   router.push(path)

@@ -37,14 +37,18 @@
               v-if="calendarMode === 'view'"
               :holidays="holidays"
               :today="today"
-              :course-dates="courseDates"
+              :counseling-dates="counselingDates"
+              :club-dates="clubDates"
+              :user-events="userEvents"
             />
             <BaseCalendar 
               v-else
               v-model="selectedDate"
               :holidays="holidays"
               :today="today"
-              :course-dates="courseDates"
+              :counseling-dates="counselingDates"
+              :club-dates="clubDates"
+              :user-events="userEvents"
             />
             <div class="mt-4 pt-4 border-t border-brown-8 text-center">
               <p class="text-sm text-brown-5 mb-1">選擇的日期</p>
@@ -122,21 +126,7 @@
             <BaseButton variant="primary" size="large" :disabled="true">Disabled State</BaseButton>
             <BaseButton variant="primary" size="medium" :disabled="true">Disabled State</BaseButton>
             <BaseButton variant="brown" size="large">Brown / Large</BaseButton>
-            <BaseButton variant="brown" size="medium">Brown / Medium</BaseButton>
             
-          </div>
-        </div>
-      </section>
-
-      <section class="grid gap-6 lg:grid-cols-2">
-        <div class="bg-white border border-brown-8 rounded-[24px] p-6 space-y-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
-          <BaseTypography variant="title" tag="h2" class="text-brown-2">Inputs & Dropdown</BaseTypography>
-          <div class="space-y-4">
-            <BaseInput
-              v-model="inputDefault"
-              label="一般輸入"
-              placeholder="請輸入內容"
-            />
             <BaseInput
               v-model="inputError"
               label="錯誤狀態"
@@ -159,45 +149,6 @@
           </div>
         </div>
 
-        <div class="bg-white border border-brown-8 rounded-[24px] p-6 space-y-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
-          <BaseTypography variant="title" tag="h2" class="text-brown-2">Learning Frequency Card</BaseTypography>
-          <div class="space-y-4">
-            <LearningFrequencyCard
-              :value="62"
-              title="簡單練習前"
-              status-text="學習頻率尚可"
-              :info-number="12"
-              @info-click="handleFrequencyInfo"
-              @click="handleFrequencyClick"
-            />
-            <LearningFrequencyCard
-              :value="85"
-              title="完成課程數"
-              status-text="學習狀態良好"
-              progress-color="#85C7A4"
-              :info-number="8"
-              @info-click="handleFrequencyInfo"
-              @click="handleFrequencyClick"
-            />
-            <LearningFrequencyCard
-              :value="30"
-              title="本週練習"
-              status-text="需要加強"
-              progress-color="#FF3D00"
-              :show-info-icon="true"
-              :info-number="3"
-            />
-            
-            <BaseTypography variant="subtitle" tag="h3" class="text-brown-5 mb-2">未登入狀態展示</BaseTypography>
-            <LearningFrequencyCard
-              :value="('-' as FrequencyCardValue)"
-              :info-number="('-' as FrequencyCardValue)"
-              :progress-color="'#A89A8D'"
-              :show-info-icon="true"
-              :show-arrow="true"
-            />
-          </div>
-        </div>
         
       </section>
 
@@ -242,6 +193,46 @@
               <BaseToggle v-model="toggleReminder" label="開啟課程提醒" />
               <BaseToggle v-model="toggleMuted" label="靜音模式" :disabled="true" />
             </div>
+          </div>
+        </div>
+        
+        <div class="bg-white border border-brown-8 rounded-[24px] p-6 space-y-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
+          <BaseTypography variant="title" tag="h2" class="text-brown-2">Learning Frequency Card</BaseTypography>
+          <div class="space-y-4">
+            <LearningFrequencyCard
+              :value="62"
+              title="簡單練習前"
+              status-text="學習頻率尚可"
+              :info-number="12"
+              @info-click="handleFrequencyInfo"
+              @click="handleFrequencyClick"
+            />
+            <LearningFrequencyCard
+              :value="85"
+              title="完成課程數"
+              status-text="學習狀態良好"
+              progress-color="#85C7A4"
+              :info-number="8"
+              @info-click="handleFrequencyInfo"
+              @click="handleFrequencyClick"
+            />
+            <LearningFrequencyCard
+              :value="30"
+              title="本週練習"
+              status-text="需要加強"
+              progress-color="#FF3D00"
+              :show-info-icon="true"
+              :info-number="3"
+            />
+            
+            <BaseTypography variant="subtitle" tag="h3" class="text-brown-5 mb-2">未登入狀態展示</BaseTypography>
+            <LearningFrequencyCard
+              :value="('-' as FrequencyCardValue)"
+              :info-number="('-' as FrequencyCardValue)"
+              :progress-color="'#A89A8D'"
+              :show-info-icon="true"
+              :show-arrow="true"
+            />
           </div>
         </div>
         
@@ -558,29 +549,37 @@ const createDate = (year: number, month: number, day: number) => {
 const selectedDate = ref(new Date()) // 初始顯示 2025年11月
 const today = ref(new Date()) // 2025年11月17日
 const holidays = ref([
-  new Date(2025, 10, 6),   // 2025/11/6
-  new Date(2025, 10, 12),  // 2025/11/12
-  new Date(2025, 10, 13),  // 2025/11/13
-  new Date(2025, 10, 17),  // 2025/11/17
-  new Date(2025, 10, 20),  // 2025/11/20
-  new Date(2025, 10, 24),  // 2025/11/24
-  new Date(2025, 10, 27),  // 2025/11/27
-  new Date(2025, 10, 30)   // 2025/11/30
+  new Date(2026, 1, 6),   // 2026/2/6
+  new Date(2026, 1, 12),  // 2026/2/12
+  new Date(2026, 1, 13),  // 2026/2/13
+  new Date(2026, 1, 17),  // 2026/2/17
+  new Date(2026, 1, 20),  // 2026/2/20
+  new Date(2026, 1, 24),  // 2026/2/24
+  new Date(2026, 1, 27),  // 2026/2/27
+  new Date(2026, 1, 30)   // 2026/2/30
 ])
 
-// 有課程的日期（顯示兩個點點）
+// 有課程的日期（顯示兩個點點） — 以目前系統日期所在的月為基準產生示範資料
+const _now = new Date()
 const courseDates = ref([
-  new Date(2025, 10, 1),   // 2025/11/1
-  new Date(2025, 10, 6),   // 2025/11/6
-  new Date(2025, 10, 7),   // 2025/11/7
-  new Date(2025, 10, 8),   // 2025/11/8
-  new Date(2025, 10, 9),   // 2025/11/9
-  new Date(2025, 10, 13),  // 2025/11/13
-  new Date(2025, 10, 14),  // 2025/11/14
-  new Date(2025, 10, 15),  // 2025/11/15
-  new Date(2025, 10, 18),  // 2025/11/18
-  new Date(2025, 10, 19),  // 2025/11/19
-  new Date(2025, 10, 27)   // 2025/11/27
+  new Date(_now.getFullYear(), _now.getMonth(), 1),
+  new Date(_now.getFullYear(), _now.getMonth(), 6),
+  new Date(_now.getFullYear(), _now.getMonth(), 7),
+  new Date(_now.getFullYear(), _now.getMonth(), 8),
+  new Date(_now.getFullYear(), _now.getMonth(), 9),
+  new Date(_now.getFullYear(), _now.getMonth(), 9),
+  new Date(_now.getFullYear(), _now.getMonth(), 14),
+  new Date(_now.getFullYear(), _now.getMonth(), 15),
+  new Date(_now.getFullYear(), _now.getMonth(), 18),
+  new Date(_now.getFullYear(), _now.getMonth(), 19),
+  new Date(_now.getFullYear(), _now.getMonth(), 27)
+])
+
+// Demo: split `courseDates` into counseling vs club arrays so calendar shows two colored dots
+const counselingDates = ref(courseDates.value.filter((_, i) => i % 2 === 0))
+const clubDates = ref(courseDates.value.filter((_, i) => i % 2 === 1))
+const userEvents = ref([
+  new Date(_now.getFullYear(), _now.getMonth(), _now.getDate()) // 今天有使用者事件
 ])
 
 const showPopup = ref(false)
