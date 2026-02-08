@@ -355,33 +355,57 @@ const carouselItems = ref<CarouselItem[]>([
 const searchQuery = ref('')
 const searchDisabled = ref('日文')
 
-// 搜尋建議假資料
+// 搜尋建議假資料（含 url/type/selectable 欄位）
 const searchSuggestions = [
   {
     title: '日文課程推薦',
+    url: '/courses/japanese',
+    type: '課程',
     badge: '日文討論區',
-    badgeColor: 'primary' as const
+    badgeColor: 'primary',
+    selectable: true
   },
   {
     title: '商業日文會話',
+    url: '/courses/business-jp',
+    type: '課程',
     badge: '聚樂部',
-    badgeColor: 'secondary' as const
+    badgeColor: 'secondary',
+    selectable: true
   },
   {
     title: '日文快閃文章參照',
+    url: '/posts/jp-flash',
+    type: '文章',
     badge: '學習任務',
-    badgeColor: 'alert' as const
+    badgeColor: 'alert',
+    selectable: true
   },
   {
-    title: '商業日文會話',
+    title: '日文會話不可選',
+    url: '/courses/disabled',
+    type: '課程',
     badge: '聚樂部',
-    badgeColor: 'secondary' as const,
-    disabled: true
+    badgeColor: 'secondary',
+    selectable: false
+  },
+  {
+    title: 'N5 學習任務清單',
+    url: '/tasks/n5',
+    type: '學習任務',
+    badge: '任務',
+    badgeColor: 'primary',
+    selectable: true
   }
 ]
 
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const handleSearchSelect = (suggestion: any) => {
   console.log('選擇了:', suggestion)
+  if (suggestion && suggestion.url && suggestion.disabled !== true) {
+    router.push(suggestion.url)
+  }
 }
 
 // 學習頻率卡片事件處理

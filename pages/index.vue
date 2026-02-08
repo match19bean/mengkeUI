@@ -3,12 +3,11 @@
     <div class="mx-auto w-full max-w-[1440px] space-y-8">
       <!-- 頂部搜尋列 -->
       <header class="flex items-center justify-between gap-4">
-        <BaseSearchInput
-          v-model="searchQuery"
-          placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等"
-          class="flex-1"
-          :useApi="true"
-          @search="handleSearch"
+         <BaseSearchInput 
+          v-model="searchQuery" 
+          placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等" 
+          :suggestions="searchSuggestions"
+          @select="handleSearchSelect"
         />
         <div class="flex items-center gap-4">
           <button type="button" class="flex h-6 w-6 items-center justify-center rounded-full">
@@ -139,6 +138,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
 import CourseCardSimple from '@/components/CourseCardSimple.vue'
 import BaseSearchInput from '@/components/BaseSearchInput.vue'
@@ -168,6 +168,13 @@ const handleSearch = (query: string) => {
 const handleLogout = () => {
   logout()
   router.push('/login')
+}
+
+const handleSearchSelect = (suggestion: any) => {
+  console.log('選擇了:', suggestion)
+  if (suggestion && suggestion.url && suggestion.selectable !== false) {
+    router.push(suggestion.url)
+  }
 }
 
 const statsItems = [
@@ -211,4 +218,48 @@ const carouselItems = ref<CarouselItem[]>([
     alt: '輪播圖片 3'
   }
 ])
+
+// 搜尋建議假資料（含 url/type/selectable 欄位）
+const searchSuggestions = [
+  {
+    title: '日文課程推薦',
+    url: '/courses/japanese',
+    type: '課程',
+    badge: '日文討論區',
+    badgeColor: 'primary',
+    selectable: true
+  },
+  {
+    title: '商業日文會話',
+    url: '/courses/business-jp',
+    type: '課程',
+    badge: '聚樂部',
+    badgeColor: 'secondary',
+    selectable: true
+  },
+  {
+    title: '日文快閃文章參照',
+    url: '/posts/jp-flash',
+    type: '文章',
+    badge: '學習任務',
+    badgeColor: 'alert',
+    selectable: true
+  },
+  {
+    title: '日文會話不可選',
+    url: '/courses/disabled',
+    type: '課程',
+    badge: '聚樂部',
+    badgeColor: 'secondary',
+    selectable: false
+  },
+  {
+    title: 'N5 學習任務清單',
+    url: '/tasks/n5',
+    type: '學習任務',
+    badge: '任務',
+    badgeColor: 'primary',
+    selectable: true
+  }
+]
 </script>

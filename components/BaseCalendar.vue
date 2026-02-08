@@ -80,7 +80,7 @@
         <!-- 標記：諮商(黃) 與 俱樂部(綠) — 今天不顯示小點；根據點數調整水平偏移量 -->
         <div
           v-if="(day.hasCounseling || day.hasClub) && day.isCurrentMonth && !day.isToday"
-          :class="[ 'absolute top-0 left-1/2 flex gap-0.5', (day.hasCounseling && day.hasClub) ? '-translate-x-2' : '-translate-x-1' ]"
+          :class="[ 'absolute top-0 left-1/2 flex gap-0.5', (day.hasCounseling && day.hasClub) ? '-translate-x-1/2' : '-translate-x-1/2' ]"
         >
           <div v-if="day.hasCounseling" class="w-1 h-1 rounded-full bg-complementary-1"></div>
           <div v-if="day.hasClub" class="w-1 h-1 rounded-full bg-secondary-1"></div>

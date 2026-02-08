@@ -448,7 +448,7 @@
               <div class="py-5">
                 <div class="h-[1px] mx-8 opacity-50" style="background: linear-gradient(to right, #501C1C00, #432C2C 50%, #501C1C00);"></div>
               </div>
-
+  
             <!-- 按鈕區 -->
             <div class="flex gap-3 mt-6 justify-center">
               <button
