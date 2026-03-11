@@ -150,8 +150,7 @@
 
     <!-- 註冊彈窗 -->
     <SignupPopup 
-      v-model="showSignup" 
-      @complete="handleSignupComplete"
+      v-model="showSignup"
     />
   </div>
 </template>
@@ -226,8 +225,4 @@ const handleLogin = async () => {
   }
 }
 
-const handleSignupComplete = (data: any) => {
-  console.log('註冊完成:', data)
-  // 這裡可以處理註冊完成後的邏輯，例如自動登入或顯示成功訊息
-}
 </script>

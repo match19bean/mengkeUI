@@ -267,6 +267,28 @@
         </div>
       </section>
 
+      <section class="grid gap-6 lg:grid-cols-1">
+        <div class="bg-white border border-brown-8 rounded-[24px] p-6 space-y-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
+          <BaseTypography variant="title" tag="h2" class="text-brown-2">Base Chart</BaseTypography>
+          <p class="text-sm text-brown-5 mb-4">這是一個基本的柱狀圖元件，展示了百分比、提示文字和數據柱的樣式。</p>
+          <BaseChart
+            :percentage="81.25"
+            title="出席狀況良好"
+            hint="編繩保持，成功近在眼尺！"
+            :data="chartData"
+            :maxValue="3"
+          />
+        </div>
+        <div class="bg-white border border-brown-8 rounded-[24px] p-6 space-y-6 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
+          <ClassProgressCard 
+            title="日文入門班"
+            :completed="16"
+            :total="30"
+            progressColor="#3E7871"
+          />
+        </div>
+        
+      </section>
     </div>
   </div>
 </template>
@@ -608,6 +630,32 @@ const userEvents = ref([
 
 const showPopup = ref(false)
 const calendarMode = ref<'view' | 'select'>('view')
+
+// 圖表假資料 - 22 天的登入頻率資料
+const chartData = ref([
+  { value: 1, label: '1' },
+  { value: 1, label: '2' },
+  { value: 1, label: '3' },
+  { value: 1, label: '4' },
+  { value: 1, label: '5' },
+  { value: 1, label: '6' },
+  { value: 1, label: '7' },
+  { value: 2, label: '8' },
+  { value: 1, label: '9' },
+  { value: 1, label: '10' },
+  { value: 1, label: '11' },
+  { value: 3, label: '12' },
+  { value: 1, label: '13' },
+  { value: 3, label: '14' },
+  { value: 1, label: '15' },
+  { value: 1, label: '16' },
+  { value: 1, label: '17' },
+  { value: 1, label: '18' },
+  { value: 1, label: '19' },
+  { value: 1, label: '20' },
+  { value: 1, label: '21' },
+  { value: 1, label: '22' }
+])
 
 </script>
 

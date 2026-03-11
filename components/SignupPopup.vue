@@ -4,7 +4,33 @@
       v-if="modelValue" 
       class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
     >
-      <div class="bg-[#F8F7F0] rounded-3xl shadow-popup w-full max-w-[40vw] mx-4 relative">
+      <!-- 註冊成功彈窗 -->
+      <Popup v-if="showSuccessPopup" @close="handleSuccessPopupClose" @confirm="handlePopupConfirm">
+        <template #default>
+          <h2 v-if="signupStatus === 'success'" class="text-h3 font-bold mb-4 text-green-600">註冊成功</h2>
+          <h2 v-else class="text-h3 font-bold mb-4 text-red-600">註冊失敗</h2>
+          <p class="text-body text-brown-2 mb-6">{{ signupMessage }}</p>
+          <div class="flex gap-3 justify-center">
+            <button 
+              v-if="signupStatus === 'success'"
+              type="button"
+              class="h-[40px] px-6 bg-primary-1 text-white rounded-xl font-semibold hover:bg-primary-2 transition text-body"
+              @click="handlePopupConfirm"
+            >
+              返回首頁
+            </button>
+            <button 
+              v-else
+              type="button"
+              class="h-[40px] px-6 bg-[#36201080] text-white rounded-xl font-semibold hover:bg-[#8A7354] transition text-bodym"
+              @click="handleSuccessPopupClose"
+            >
+              返回表單
+            </button>
+          </div>
+        </template>
+      </Popup>
+      <div v-if="!showSuccessPopup" class="bg-[#F8F7F0] rounded-3xl shadow-popup w-full max-w-[40vw] mx-4 relative">
         <!-- 關閉按鈕 -->
         <button 
           class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-brown-9 text-brown-3 cursor-pointer transition z-10" 
@@ -330,18 +356,48 @@
                 />
               </div>
 
-              <div class="w-[200px]">
-                <BaseDropdown
-                  v-model="form.currentLevel"
-                  :options="[
-                    { label: '初級', value: 'beginner' },
-                    { label: '中級', value: 'intermediate' },
-                    { label: '高級', value: 'advanced' }
-                  ]"
-                  placeholder="目前的程度"
-                  :error="hasError('currentLevel')"
-                />
+              <div class="flex items-start gap-2 relative">
+                <div class="w-[200px]">
+                  <BaseDropdown
+                    v-model="form.currentLevel"
+                    :options="levelOptions"
+                    placeholder="目前的程度"
+                    :error="hasError('currentLevel')"
+                  />
+                </div>
+                <button
+                  type="button"
+                  @click.stop.prevent="showLevelInfo = true"
+                  class="w-6 h-6 rounded-full bg-primary-1 text-white flex items-center justify-center text-xs font-bold hover:bg-primary-2 transition mt-1 flex-shrink-0"
+                  title="點擊查看等級說明"
+                >
+                  !
+                </button>
               </div>
+
+              <!-- 等級說明彈窗 -->
+              <Transition name="fade">
+                <div v-if="showLevelInfo" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100]" @click.stop.prevent="showLevelInfo = false">
+                  <div class="bg-[#F8F7F0] rounded-3xl shadow-popup w-full max-w-[50vw] mx-4 p-8 relative" @click.stop>
+                    <button
+                      type="button"
+                      @click.stop.prevent="showLevelInfo = false"
+                      class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-brown-9 text-brown-3 cursor-pointer transition"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                        <path d="M6 6l8 8M14 6l-8 8" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+
+                    <h3 class="text-h3 font-bold text-[#36201080] mb-6">語言程度等級說明</h3>
+                    <div class="space-y-4 max-h-[60vh] overflow-y-auto">
+                      <div v-for="(desc, level) in levelDescriptions" :key="level" class="border-l-4 border-primary-1 pl-4 py-2">
+                        <h3 class="font-bold text-[#36201080] text-sm leading-relaxed">{{ desc }}</h3>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
 
               <!-- 過往學習標題 -->
               <h3 class="text-base font-genyogothic font-black text-[#36201080] mb-4 leading-4 tracking-[2px]">過往學習</h3>
@@ -512,10 +568,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useTaiwanAddress } from '~/composables/useTaiwanAddress'
-import { useVerificationCode } from '~/composables/useVerificationCode'
-import { usePasswordValidation } from '~/composables/usePasswordValidation'
+import { useAuth } from '~/composables/useAuth'
+import Popup from './Popup.vue'
+
+import { useRegister } from '~/composables/useRegister'
 
 interface Props {
   modelValue: boolean
@@ -543,6 +599,16 @@ const stepTitles = [
   '個人資訊',
   '學習資訊', 
   '確認註冊內容'
+]
+
+const levelOptions = [
+  { label: 'A0新手：完全沒碰過', value: 'A0' },
+  { label: 'A1入門級：超基礎日常用語（初接觸）', value: 'A1' },
+  { label: 'A2初級：可以簡單表達個人、家庭及工作狀態', value: 'A2' },
+  { label: 'B1中級：可以簡單應對工作、學習、旅行等自身常見的內容', value: 'B1' },
+  { label: 'B2中高級：可以在不同的專業領域下使用目標語言，但可能需要提前準備', value: 'B2' },
+  { label: 'C1高級：對於目標語言駕輕就熟，絕大多數話題基本不需要提前準備', value: 'C1' },
+  { label: 'C2精通：可以輕鬆地解釋較艱澀的文章及演講內容', value: 'C2' }
 ]
 
 const form = ref({
@@ -585,6 +651,40 @@ const confirmPasswordError = ref('')
 const agreeTerms = ref(false)
 const agreePrivacy = ref(false)
 const showPassword = ref(false)
+const showSuccessPopup = ref(false)
+const showLevelInfo = ref(false)
+const signupStatus = ref<'success' | 'error' | null>(null)
+const signupMessage = ref('')
+const { login } = useAuth()
+
+const levelDescriptions = levelOptions.reduce<Record<string, string>>((acc, option) => {
+  acc[option.value] = option.label
+  return acc
+}, {})
+
+// 註冊成功彈窗關閉處理
+const handleSuccessPopupClose = () => {
+  if (signupStatus.value === 'success') {
+    // 成功則導航回首頁
+    navigateTo('/')
+  } else {
+    // 失敗則關閉彈窗保持在表單
+    showSuccessPopup.value = false
+    signupStatus.value = null
+  }
+}
+
+// 確認按鈕處理
+const handlePopupConfirm = () => {
+  if (signupStatus.value === 'success') {
+    navigateTo('/')
+  } else {
+    showSuccessPopup.value = false
+    signupStatus.value = null
+  }
+}
+// 註冊 composable
+const { register } = useRegister()
 
 // 简化的错误状态管理
 const errors = ref<Record<string, string>>({})
@@ -811,10 +911,36 @@ const handleNext = () => {
   if (currentStep.value < 3) {
     currentStep.value++
   } else {
-    // 完成註冊
-    console.log('註冊資料:', form.value)
-    emit('complete', form.value)
-    closePopup()
+    // 完成註冊，呼叫 register API
+    const registerData = {
+      account: form.value.account,
+      password: form.value.password,
+      email: form.value.email,
+      nickname: form.value.nickname
+    }
+    register(registerData).then(async (res) => {
+      if (res.success) {
+        // 註冊成功後自動登入
+        const loginResult = await login({
+          account: registerData.account,
+          password: registerData.password
+        })
+        if (loginResult.success) {
+          showSuccessPopup.value = true
+          signupStatus.value = 'success'
+          signupMessage.value = '恭喜您註冊成功，已自動登入！'
+          emit('complete', { ...form.value, registerResult: res, loginResult })
+        } else {
+          showSuccessPopup.value = true
+          signupStatus.value = 'error'
+          signupMessage.value = loginResult.message || '自動登入失敗'
+        }
+      } else {
+        showSuccessPopup.value = true
+        signupStatus.value = 'error'
+        signupMessage.value = res.message || '註冊失敗'
+      }
+    })
   }
 }
 
@@ -997,12 +1123,7 @@ watch(() => form.value.learningPurpose, (val) => {
 })
 
 watch(() => form.value.currentLevel, (val) => {
-  const map: Record<string,string> = {
-    beginner: '初級',
-    intermediate: '中級',
-    advanced: '高級'
-  }
-  form.value.currentLevelText = val ? (map[val] || val) : ''
+  form.value.currentLevelText = val ? (levelDescriptions[val] || val) : ''
 })
 
 watch(() => form.value.education, (val) => {

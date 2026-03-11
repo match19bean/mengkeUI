@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-cream rounded-[24px] overflow-hidden w-[256px] shadow-card">
+  <div class="bg-cream rounded-[24px] overflow-hidden w-[270px] shadow-card">
     <!-- 課程圖片 -->
     <div class="mx-4 mt-[17px] bg-brown-8 rounded-[24px] overflow-hidden h-[160px]" style="box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);">
       <img v-if="image" :src="image" :alt="title" class="w-full h-full object-contain" />
@@ -10,7 +10,7 @@
     <div class="pt-[17px] pr-4 pb-[17px] pl-4 space-y-2">
       <!-- 標題和狀態標籤 -->
       <div class="flex items-start justify-between gap-3">
-        <h3 class="text-base font-bold text-brown-1 flex-1">{{ title }}</h3>
+        <h3 class="text-base font-bold text-brown-1 flex-1" :title="title">{{ displayTitle }}</h3>
         <span 
           v-if="status"
           :class="statusClasses"
@@ -64,6 +64,7 @@
           variant="outline" 
           size="medium"
           class="!rounded-[12px] !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
+          :disabled="!isAuthenticated"
           @click="$emit('view-detail')"
         >
           課程頁面
@@ -71,7 +72,7 @@
         <BaseButton 
           variant="primary" 
           size="medium"
-          :disabled="!canEnterCourse"
+          :disabled="!canEnterCourse || !isAuthenticated"
           @click="$emit('enter-course')"
         >
           {{ enterButtonText }}
@@ -83,6 +84,8 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
+
+const { isAuthenticated } = useAuth()
 
 interface Props {
   title: string
@@ -215,5 +218,12 @@ const computedProgress = computed(() => {
   if (now < range.start) return 0
   if (now > range.end) return 100
   return Math.round(((now - range.start) / (range.end - range.start)) * 100)
+})
+
+const displayTitle = computed(() => {
+  if (props.title.length > 6) {
+    return props.title.substring(0, 6) + '...'
+  }
+  return props.title
 })
 </script>

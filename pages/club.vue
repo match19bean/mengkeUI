@@ -1,11 +1,320 @@
 <template>
-  <div class="max-w-7xl mx-auto p-8">
-    <BaseTypography variant="h2" tag="h1" class="mb-4">聚樂部</BaseTypography>
-    <BaseTypography variant="body" tag="p" class="text-brown-5">
-      聚樂部內容區域
-    </BaseTypography>
+  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
+    <div class="mx-auto w-full max-w-[1440px] space-y-8">
+      <!-- 頂部搜尋列 -->
+      <TopSearchBar 
+        v-model="searchQuery"
+        :suggestions="searchSuggestions"
+        @select="handleSearchSelect"
+      />
+
+
+      <!-- 課程卡片區域 -->
+      <section class="space-y-4">
+        <div class="space-y-1">
+          <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
+            你的俱樂部課程
+          </BaseTypography>
+          <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
+            根據你的學習狀態，這些課程最適合你唷！
+          </BaseTypography>
+        </div>
+        <div class="overflow-x-auto py- px-2 course-scroll">
+          <div class="flex min-w-min pb-6 pt-2">
+            <div 
+              v-for="course in courses"
+              :key="course.id"
+              class="flex-shrink-0 w-72"
+            >
+              <CourseCard
+                :title="course.title"
+                :status="course.status"
+                :status-type="course.statusType"
+                :tags="course.tags"
+                :show-progress="course.showProgress"
+                :progress="course.progress"
+                :time-info="course.timeInfo"
+                :image="course.image"
+                :bookmarked="courseBookmarks[course.id]"
+                :can-enter-course="course.canEnterCourse"
+                :enter-button-text="course.enterButtonText"
+                @toggle-bookmark="toggleCourseBookmark(course.id)"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 統計區域 -->
+      <section class="grid gap-4 xl:grid-cols-2">
+        <!-- 課程出席率 -->
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2">
+          <div class="space-y-1">
+            <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
+              課程出席率
+            </BaseTypography>
+            <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
+              依據老師排課及自行選課後，系統自動計算的結果
+            </BaseTypography>
+          </div>
+          <BaseChart
+            :percentage="81.25"
+            title="出席狀況良好"
+            hint="保持學習成果，持續進步！"
+            :data="attendanceData"
+            :maxValue="5"
+            chartHeight="240px"
+          />
+        </div>
+
+        <!-- 剩餘堂數 -->
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2">
+          <div class="space-y-1">
+            <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
+              剩餘堂數
+            </BaseTypography>
+            <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
+              不用再詢問，這邊就是你剩餘的堂數！
+            </BaseTypography>
+          </div>
+          <div class="space-y-4">
+            <ClassProgressCard
+              title="日文入門班"
+              :completed="16"
+              :total="30"
+              progressColor="#E8996D"
+            />
+            <ClassProgressCard
+              title="英文多言解"
+              :completed="29"
+              :total="30"
+              progressColor="#F2A74B"
+            />
+            <ClassProgressCard
+              title="韓文基數"
+              :completed="2"
+              :total="12"
+              progressColor="#4285F4"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import TopSearchBar from '@/components/TopSearchBar.vue'
+import ClassProgressCard from '@/components/ClassProgressCard.vue'
+
+const router = useRouter()
+
+interface Course {
+  id: string
+  title: string
+  status: string
+  statusType: 'ongoing' | 'today' | 'other'
+  tags: string[]
+  showProgress: boolean
+  progress?: number
+  timeInfo: string
+  image?: string
+  canEnterCourse: boolean
+  enterButtonText?: string
+}
+
+// 課程數據
+const courses = ref<Course[]>([
+  {
+    id: 'course1',
+    title: 'N5綜合養成',
+    status: '進行中',
+    statusType: 'ongoing',
+    tags: ['N5', '語彙', '聽解'],
+    showProgress: true,
+    progress: 50,
+    timeInfo: '22:30 - 23:00',
+    canEnterCourse: true
+  },
+  {
+    id: 'course2',
+    title: '日文口說養成',
+    status: '今日',
+    statusType: 'today',
+    tags: ['N2', '主題', '聽解'],
+    showProgress: true,
+    progress: 0,
+    timeInfo: '10:00 - 12:30',
+    canEnterCourse: false
+  },
+  {
+    id: 'course3',
+    title: '日文主題班',
+    status: '星期四',
+    statusType: 'other',
+    tags: ['N3', '文法', '閱讀'],
+    showProgress: true,
+    progress: 0,
+    timeInfo: '10:00 - 12:30',
+    canEnterCourse: false,
+    enterButtonText: '提醒我'
+  },
+  {
+    id: 'course4',
+    title: 'N3文法養成',
+    status: '11/4',
+    statusType: 'other',
+    tags: ['N3', '文法', '閱讀'],
+    showProgress: true,
+    progress: 0,
+    timeInfo: '10:00 - 12:30',
+    canEnterCourse: true
+  },
+  {
+    id: 'course5',
+    title: 'N2聽力突破',
+    status: '進行中',
+    statusType: 'ongoing',
+    tags: ['N2', '聽解', '實戰'],
+    showProgress: true,
+    progress: 75,
+    timeInfo: '19:00 - 20:30',
+    canEnterCourse: true
+  },
+  {
+    id: 'course6',
+    title: '敬語與商務日文',
+    status: '星期一',
+    statusType: 'other',
+    tags: ['N1', '敬語', '商務'],
+    showProgress: true,
+    progress: 0,
+    timeInfo: '14:00 - 16:00',
+    canEnterCourse: false,
+    enterButtonText: '提醒我'
+  },
+  {
+    id: 'course7',
+    title: '日文漢字速成',
+    status: '今日',
+    statusType: 'today',
+    tags: ['N4', '漢字', '基礎'],
+    showProgress: true,
+    progress: 0,
+    timeInfo: '11:00 - 12:00',
+    canEnterCourse: true
+  },
+  {
+    id: 'course8',
+    title: '日本文化與語言',
+    status: '進行中',
+    statusType: 'ongoing',
+    tags: ['文化', '語言', '拓展'],
+    showProgress: true,
+    progress: 30,
+    timeInfo: '20:00 - 21:00',
+    canEnterCourse: true
+  }
+])
+
+// 課程書籤狀態
+const courseBookmarks = ref<Record<string, boolean>>({
+  course1: true,
+  course2: true,
+  course3: false,
+  course4: false
+})
+
+const toggleCourseBookmark = (courseId: string) => {
+  courseBookmarks.value[courseId] = !courseBookmarks.value[courseId]
+}
+
+// 搜尋相關
+const searchQuery = ref('')
+
+const searchSuggestions = [
+  {
+    title: '日文課程推薦',
+    url: '/courses/japanese',
+    type: '課程',
+    badge: '日文討論區',
+    badgeColor: 'primary',
+    selectable: true
+  },
+  {
+    title: '商業日文會話',
+    url: '/courses/business-jp',
+    type: '課程',
+    badge: '聚樂部',
+    badgeColor: 'secondary',
+    selectable: true
+  },
+  {
+    title: '日文快閃文章參照',
+    url: '/posts/jp-flash',
+    type: '文章',
+    badge: '學習任務',
+    badgeColor: 'alert',
+    selectable: true
+  },
+  {
+    title: 'N5 學習任務清單',
+    url: '/tasks/n5',
+    type: '學習任務',
+    badge: '任務',
+    badgeColor: 'primary',
+    selectable: true
+  }
+]
+
+const handleSearchSelect = (suggestion: any) => {
+  console.log('選擇了:', suggestion)
+}
+
+// 出席率圖表數據
+const attendanceData = ref([
+  { value: 1, label: '1' },
+  { value: 1, label: '2' },
+  { value: 1, label: '3' },
+  { value: 1, label: '4' },
+  { value: 1, label: '5' },
+  { value: 1, label: '6' },
+  { value: 1, label: '7' },
+  { value: 2, label: '8' },
+  { value: 1, label: '9' },
+  { value: 1, label: '10' },
+  { value: 1, label: '11' },
+  { value: 3, label: '12' },
+  { value: 1, label: '13' },
+  { value: 3, label: '14' },
+  { value: 1, label: '15' },
+  { value: 1, label: '16' },
+  { value: 1, label: '17' },
+  { value: 1, label: '18' },
+  { value: 1, label: '19' },
+  { value: 1, label: '20' },
+  { value: 1, label: '21' },
+  { value: 1, label: '22' }
+])
 </script>
+
+<style scoped>
+.course-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.course-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.course-scroll::-webkit-scrollbar-thumb {
+  background-color: #EE7959;
+  border-radius: 4px;
+}
+
+.course-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #D87E55;
+}
+</style>

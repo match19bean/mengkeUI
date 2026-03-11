@@ -34,48 +34,37 @@ export const useAuth = () => {
    * 登入
    */
   const login = async (params: LoginParams) => {
-    try {
-      const response = await $fetch<LoginResponse>(
-        `${API_BASE}/auth/login`,
-        {
-          method: 'POST',
-          body: {
-            account: params.account,
-            password: params.password
-          }
-        }
-      )
-
-      if (response.access_token && response.member) {
-        // 保存 token 和用戶資訊
-        token.value = response.access_token
-        user.value = response.member
-
-        // 可以選擇將 token 保存到 localStorage
-        if (import.meta.client) {
-          localStorage.setItem('auth-token', response.access_token)
-          localStorage.setItem('auth-user', JSON.stringify(response.member))
-        }
-
-        return {
-          success: true,
-          data: {
-            token: response.access_token,
-            user: response.member
-          }
-        }
+    // --- FAKE LOGIN ---
+    // 這裡直接模擬登入成功，回傳假資料
+    const fakeResponse: LoginResponse = {
+      access_token: 'fake-access-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      member: {
+        id: 1,
+        nickname: 'User',
+        account: params.account,
+        email: 'demo@example.com',
+        email_valid: 1,
+        password: params.password,
+        status: 1
       }
+    }
 
-      return {
-        success: false,
-        message: '登入失敗'
-      }
-    } catch (error: any) {
-      console.error('登入 API 錯誤:', error)
-      
-      return {
-        success: false,
-        message: error.data?.message || '登入失敗，請稍後再試'
+    token.value = fakeResponse.access_token
+    user.value = fakeResponse.member
+
+    if (import.meta.client) {
+      localStorage.setItem('auth-token', fakeResponse.access_token)
+      localStorage.setItem('auth-user', JSON.stringify(fakeResponse.member))
+    }
+
+    return {
+      success: true,
+      message: '登入成功',
+      data: {
+        token: fakeResponse.access_token,
+        user: fakeResponse.member
       }
     }
   }

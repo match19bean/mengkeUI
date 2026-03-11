@@ -1,37 +1,14 @@
 <template>
-  <div class="min-h-screen bg-cream px-4 py-6 lg:px-10 lg:py-10">
+  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
     <div class="mx-auto w-full max-w-[1440px] space-y-8">
       <!-- 頂部搜尋列 -->
-      <header class="flex items-center justify-between gap-4">
-         <BaseSearchInput 
-          v-model="searchQuery" 
-          placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等" 
-          :suggestions="searchSuggestions"
-          @select="handleSearchSelect"
-        />
-        <div class="flex items-center gap-4">
-          <button type="button" class="flex h-6 w-6 items-center justify-center rounded-full">
-            <img src="/images/bell.svg" alt="通知" class="h-5 w-5" />
-          </button>
-          <NuxtLink 
-            v-if="!isAuthenticated" 
-            to="/login" 
-            class="flex h-[18px] w-[18px] items-center justify-center rounded-full"
-          >
-            <img src="/images/sign.svg" alt="登入" class="h-6 w-6" />
-          </NuxtLink>
-          <button 
-            v-else
-            @click="handleLogout"
-            type="button" 
-            class="flex h-[18px] w-[18px] items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-          >
-            <img src="/images/sign.svg" alt="登出" class="h-6 w-6" />
-          </button>
-        </div>
-      </header>
+      <TopSearchBar 
+        v-model="searchQuery"
+        :suggestions="searchSuggestions"
+        @select="handleSearchSelect"
+      />
 
-      <div class="grid gap-6 lg:grid-cols-[3fr_1fr]">
+      <div class="grid gap-6 2xl:grid-cols-[3fr_1fr]">
         <!-- 左側主內容 -->
         <main class="space-y-8">
           <!-- 最新公告 -->
@@ -50,7 +27,7 @@
           </section>
 
           <!-- 下方雙欄：反轉學習 / 聚樂部課表 -->
-          <section class="grid gap-4 lg:grid-cols-2">
+          <section class="grid gap-4 2xl:grid-cols-2">
             <!-- 反轉學習 -->
             <div class="grid grid-rows-[auto_auto_1fr] gap-2">
               <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
@@ -141,8 +118,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
 import CourseCardSimple from '@/components/CourseCardSimple.vue'
-import BaseSearchInput from '@/components/BaseSearchInput.vue'
 import BaseCarousel from '@/components/BaseCarousel.vue'
+import TopSearchBar from '@/components/TopSearchBar.vue'
 
 const router = useRouter()
 const { isAuthenticated, logout } = useAuth()
@@ -157,24 +134,8 @@ type FrequencyCardValue = number | string
 
 const searchQuery = ref('')
 
-// 搜尋處理函數
-const handleSearch = (query: string) => {
-  console.log('執行搜尋:', query)
-  // 這裡可以導航到搜尋結果頁面
-  // navigateTo(`/search?q=${encodeURIComponent(query)}`)
-}
-
-// 登出處理函數
-const handleLogout = () => {
-  logout()
-  router.push('/login')
-}
-
 const handleSearchSelect = (suggestion: any) => {
   console.log('選擇了:', suggestion)
-  if (suggestion && suggestion.url && suggestion.selectable !== false) {
-    router.push(suggestion.url)
-  }
 }
 
 const statsItems = [
