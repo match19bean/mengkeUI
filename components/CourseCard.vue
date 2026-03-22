@@ -64,7 +64,6 @@
           variant="outline" 
           size="medium"
           class="!rounded-[12px] !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
-          :disabled="!isAuthenticated"
           @click="$emit('view-detail')"
         >
           課程頁面

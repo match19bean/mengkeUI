@@ -602,14 +602,24 @@ const stepTitles = [
 ]
 
 const levelOptions = [
-  { label: 'A0新手：完全沒碰過', value: 'A0' },
-  { label: 'A1入門級：超基礎日常用語（初接觸）', value: 'A1' },
-  { label: 'A2初級：可以簡單表達個人、家庭及工作狀態', value: 'A2' },
-  { label: 'B1中級：可以簡單應對工作、學習、旅行等自身常見的內容', value: 'B1' },
-  { label: 'B2中高級：可以在不同的專業領域下使用目標語言，但可能需要提前準備', value: 'B2' },
-  { label: 'C1高級：對於目標語言駕輕就熟，絕大多數話題基本不需要提前準備', value: 'C1' },
-  { label: 'C2精通：可以輕鬆地解釋較艱澀的文章及演講內容', value: 'C2' }
+  { label: 'A0新手', value: 'A0' },
+  { label: 'A1入門', value: 'A1' },
+  { label: 'A2初級', value: 'A2' },
+  { label: 'B1中級', value: 'B1' },
+  { label: 'B2中高', value: 'B2' },
+  { label: 'C1高級', value: 'C1' },
+  { label: 'C2精通', value: 'C2' }
 ]
+
+const levelDescriptions: Record<string, string> = {
+  'A0': 'A0新手：完全沒碰過',
+  'A1': 'A1入門級：超基礎日常用語（初接觸）',
+  'A2': 'A2初級：可以簡單表達個人、家庭及工作狀態',
+  'B1': 'B1中級：可以簡單應對工作、學習、旅行等常見內容',
+  'B2': 'B2中高級：可以在不同專業領域使用，某些場合需提前準備',
+  'C1': 'C1高級：駕輕就熟，大多數話題不需提前準備',
+  'C2': 'C2精通：可以輕鬆理解並解釋艱澀的文章及演講內容'
+}
 
 const form = ref({
   account: '',
@@ -656,11 +666,6 @@ const showLevelInfo = ref(false)
 const signupStatus = ref<'success' | 'error' | null>(null)
 const signupMessage = ref('')
 const { login } = useAuth()
-
-const levelDescriptions = levelOptions.reduce<Record<string, string>>((acc, option) => {
-  acc[option.value] = option.label
-  return acc
-}, {})
 
 // 註冊成功彈窗關閉處理
 const handleSuccessPopupClose = () => {

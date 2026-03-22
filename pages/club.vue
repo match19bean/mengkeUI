@@ -8,16 +8,42 @@
         @select="handleSearchSelect"
       />
 
-
       <!-- 課程卡片區域 -->
       <section class="space-y-4">
-        <div class="space-y-1">
-          <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
-            你的俱樂部課程
-          </BaseTypography>
-          <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
-            根據你的學習狀態，這些課程最適合你唷！
-          </BaseTypography>
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
+              你的俱樂部課程
+            </BaseTypography>
+            <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
+              根據你的學習狀態，這些課程最適合你唷！
+            </BaseTypography>
+          </div>
+          <div class="flex gap-3 flex-shrink-0">
+            <BaseButton 
+              variant="outline" 
+              size="large"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent disabled:!bg-brown-9 disabled:!text-white/60 disabled:!cursor-not-allowed"
+            >
+              當月課表
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="large"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent disabled:!bg-brown-9 disabled:!text-white/60 disabled:!cursor-not-allowed"
+              :disabled="!isAuthenticated"
+            >
+              我的課表
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="large"
+              class="!px-10 !rounded-lg !pt-[9px] !pb-[9px] !bg-primary-1 !text-cream !border-transparent disabled:!bg-brown-9 disabled:!text-white/60 disabled:!cursor-not-allowed"
+              :disabled="!isAuthenticated"
+            >
+              俱樂部選課
+            </BaseButton>
+          </div>
         </div>
         <div class="overflow-x-auto py- px-2 course-scroll">
           <div class="flex min-w-min pb-6 pt-2">
@@ -46,9 +72,9 @@
       </section>
 
       <!-- 統計區域 -->
-      <section class="grid gap-4 xl:grid-cols-2">
+      <section class="grid gap-4 xl:grid-cols-7"> 
         <!-- 課程出席率 -->
-        <div class="grid grid-rows-[auto_auto_1fr] gap-2">
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2 xl:col-span-3">
           <div class="space-y-1">
             <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
               課程出席率
@@ -62,13 +88,12 @@
             title="出席狀況良好"
             hint="保持學習成果，持續進步！"
             :data="attendanceData"
-            :maxValue="5"
             chartHeight="240px"
           />
         </div>
 
         <!-- 剩餘堂數 -->
-        <div class="grid grid-rows-[auto_auto_1fr] gap-2">
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2 xl:col-span-2">
           <div class="space-y-1">
             <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
               剩餘堂數
@@ -96,6 +121,12 @@
               :total="12"
               progressColor="#4285F4"
             />
+            <ClassProgressCard
+              title="法文基數"
+              :completed="2"
+              :total="12"
+              progressColor="#FFAFFF"
+            />
           </div>
         </div>
       </section>
@@ -108,8 +139,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import ClassProgressCard from '@/components/ClassProgressCard.vue'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { token } = useAuth()
+const isAuthenticated = computed(() => !!token.value)
 
 interface Course {
   id: string
@@ -275,28 +309,28 @@ const handleSearchSelect = (suggestion: any) => {
 
 // 出席率圖表數據
 const attendanceData = ref([
-  { value: 1, label: '1' },
-  { value: 1, label: '2' },
-  { value: 1, label: '3' },
-  { value: 1, label: '4' },
-  { value: 1, label: '5' },
-  { value: 1, label: '6' },
-  { value: 1, label: '7' },
-  { value: 2, label: '8' },
-  { value: 1, label: '9' },
-  { value: 1, label: '10' },
-  { value: 1, label: '11' },
-  { value: 3, label: '12' },
-  { value: 1, label: '13' },
-  { value: 3, label: '14' },
-  { value: 1, label: '15' },
-  { value: 1, label: '16' },
-  { value: 1, label: '17' },
-  { value: 1, label: '18' },
-  { value: 1, label: '19' },
-  { value: 1, label: '20' },
-  { value: 1, label: '21' },
-  { value: 1, label: '22' }
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 0, expected: 0 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 2, expected: 2 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 5, expected: 8 },
+  { actual: 1, expected: 1 },
+  { actual: 5, expected: 5 },
+  { actual: 1, expected: 2 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 },
+  { actual: 1, expected: 1 }
 ])
 </script>
 

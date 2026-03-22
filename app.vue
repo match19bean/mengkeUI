@@ -21,14 +21,20 @@
     <main class="flex-1 overflow-y-auto h-screen">
       <NuxtPage />
     </main>
+    
+    <!-- 個人資料彈窗 -->
+    <ProfilePopup v-model="isProfilePopupOpen" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import ProfilePopup from '@/components/ProfilePopup.vue'
+import { useProfilePopup } from '@/composables/useProfilePopup'
 
 const route = useRoute()
 const router = useRouter()
+const { isOpen: isProfilePopupOpen, open: openProfilePopup } = useProfilePopup()
 // call useAuth() safely — if it's unavailable during init (e.g. SSR),
 // provide fallbacks so `.value` access won't throw
 const _auth = (typeof useAuth === 'function' ? useAuth() : null) ?? { user: ref(null), isAuthenticated: ref(false), initAuth: () => {} }
@@ -77,6 +83,10 @@ const sidebarMenuItems = computed(() => {
 })
 
 const handleNavigate = (path: string) => {
-  router.push(path)
+  if (path === '/profile') {
+    openProfilePopup()
+  } else {
+    router.push(path)
+  }
 }
 </script>
