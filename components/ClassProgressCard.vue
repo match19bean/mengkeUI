@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-white rounded-3xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-brown-8">
+  <div class="w-full bg-white rounded-3xl p-7 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-brown-8">
     <!-- 標題和進度文字 -->
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-black text-brown-1 flex-1 whitespace-nowrap overflow-hidden text-ellipsis" style="font-size: 16px; font-weight: 900;">
@@ -16,7 +16,7 @@
     </div>
 
     <!-- 進度條 -->
-    <div class="w-full bg-brown-8 rounded-full h-3 overflow-hidden">
+    <div class="w-full bg-brown-8 rounded-full h-4 overflow-hidden">
       <div
         v-if="completed !== null && completed !== undefined && total"
         class="h-full rounded-full transition-all duration-300"

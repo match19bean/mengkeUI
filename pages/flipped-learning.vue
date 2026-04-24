@@ -1,34 +1,178 @@
 <template>
-  <div class="min-h-screen bg-cream px-4 py-6 lg:px-10 lg:py-10">
+  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
     <div class="mx-auto w-full max-w-[1440px] space-y-8">
-      <!-- 頁面標題 -->
-      <section class="space-y-2">
-        <BaseTypography variant="h2" tag="h1" class="text-brown-1">學習任務</BaseTypography>
-        <BaseTypography variant="subtitle" tag="p" class="text-brown-5">
-          查看你的學習策略分析與學習趨勢
-        </BaseTypography>
-      </section>
+      <!-- 頂部搜尋列 -->
+      <TopSearchBar 
+        v-model="searchQuery"
+        :suggestions="searchSuggestions"
+        @select="handleSearchSelect"
+      />
+      <section class="grid gap-4 xl:grid-cols-7"> 
+        <!-- 課程出席率 -->
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2 xl:col-span-5">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
+                保持下去 ， 學習成功近在咫尺 ！ 
+              </BaseTypography>
+              <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
+                你對於我們的學習方式理解度很不錯唷 ， 持續學習下去吧 ！ <br/>不用逼自己每天學習，只要維持一定的學習熱度即可，適時地讓自己進行休息吧 ！
+              </BaseTypography>
+            </div>
+            <div class="flex justify-end gap-3 flex-shrink-0">
+             <CourseDropdown
+              placeholder="切換課程"   
+              v-model="selectedCourse"
+              :items="courseOptions"
+              size="medium"                
+              @change="handleCourseChange"
+              />
+            </div>
+          </div>
+          <div>
+            <LearningCurveChart :data="chartData" />
+          </div>
+        </div>
 
-      <!-- 圖表展示區域 -->
-      <section class="grid gap-6 lg:grid-cols-2">
-        <!-- 雷達圖 - 策略分析 -->
-        <RadarChart
-          :items="radarData"
-          :maxValue="100"
-          currentLabel="現況分數"
-          targetLabel="期望分數"
-        />
+         <!-- 課程出席率 -->
+        <div class="grid grid-rows-[auto_auto_1fr] gap-2 xl:col-span-2">
+          <div class="flex justify-end gap-3 flex-shrink-0">
+            <BaseButton 
+              variant="outline" 
+              size="large"
+              class="!px-10 !rounded-lg !pt-[9px] !pb-[9px] !bg-primary-1 !text-cream !border-transparent disabled:!bg-brown-9 disabled:!text-white/60 disabled:!cursor-not-allowed"
+            >
+              <span>諮商預約</span>
+              <span class="inline-flex min-w-[44px] items-center justify-center rounded-full bg-cream px-3 py-1 text-[14px] font-extrabold leading-none text-primary-1">
+                {{ consultationProgressText }}
+              </span>
+            </BaseButton>
+          </div>
+
+          <RadarChart
+            :items="radarData"
+            :maxValue="100"
+            currentLabel="現況分數"
+            targetLabel="期望分數"
+          />
+        </div>
       </section>
+      
+      <div class="max-w-[460px] space-y-4">
+        <LearningCycleCard
+          title="學習週期"
+          :score="50"
+          :max-score="100"
+          :phase-number="2"
+          cycle-state="waiting-analysis"
+          :remaining-days="6"
+          :progress="84"
+          start-date="11/1"
+          end-date="11/28"
+          @action-click="handleCycleAction"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import TopSearchBar from '@/components/TopSearchBar.vue'
+import LearningCurveChart from '~/components/LearningCurveChart.vue'
 import RadarChart from '@/components/RadarChart.vue'
+import CourseDropdown from '~/components/CourseDropdown.vue'
+import LearningCycleCard from '~/components/LearningCycleCard.vue'
+
+interface RadarDataItem {
+  label: string
+  current: number
+  target: number
+}
+
+// 搜尋相關
+const searchQuery = ref('')
+
+const selectedCourse = ref<string | number | null>(null)
+
+const handleCourseChange = (item: { label: string; value: string | number }) => {
+  console.log('目前選擇:', item)
+}
+
+const handleCycleAction = (state: string) => {
+  console.log('learning cycle action:', state)
+}
+
+const consultationProgressText = ref('1/3')
+
+const courseOptions = [
+  {
+    label: '反轉日文',
+    value: 'jp',
+    tag: '主要課程',
+    tagClass: 'bg-[#ee7b55]'
+  },
+  {
+    label: '反轉英文',
+    value: 'en',
+    tag: '課程標籤',
+    tagClass: 'bg-[#9d9185]'
+  },
+  {
+    label: '次要課程',
+    value: 'sub',
+    tag: '次要課程',
+    tagClass: 'bg-[#9d9185]'
+  },
+  {
+    label: '學習結束',
+    value: 'done-1',
+    tag: '學習結束',
+    tagClass: 'bg-[#9d9185]'
+  }
+]
+
+const handleSearchSelect = (suggestion: any) => {
+  console.log('選擇了:', suggestion)
+}
+
+const searchSuggestions = [
+  {
+    title: '日文課程推薦',
+    url: '/courses/japanese',
+    type: '課程',
+    badge: '日文討論區',
+    badgeColor: 'primary',
+    selectable: true
+  },
+  {
+    title: '商業日文會話',
+    url: '/courses/business-jp',
+    type: '課程',
+    badge: '聚樂部',
+    badgeColor: 'secondary',
+    selectable: true
+  },
+  {
+    title: '日文快閃文章參照',
+    url: '/posts/jp-flash',
+    type: '文章',
+    badge: '學習任務',
+    badgeColor: 'alert',
+    selectable: true
+  },
+  {
+    title: 'N5 學習任務清單',
+    url: '/tasks/n5',
+    type: '學習任務',
+    badge: '任務',
+    badgeColor: 'primary',
+    selectable: true
+  }
+]
 
 // 雷達圖數據
-const radarData = ref([
+const radarData = ref<RadarDataItem[]>([
   { label: '記憶策略', current: 20, target: 50 },
   { label: '認知策略', current: 85, target: 95 },
   { label: '補償策略', current: 60, target: 80 },
@@ -37,19 +181,14 @@ const radarData = ref([
   { label: '社交策略', current: 65, target: 75 }
 ])
 
-// 面積圖數據（兩週對比）
-const trendData = ref([
-  {
-    name: '本週',
-    color: '#FF9B80',
-    data: [5, 7, 10, 12, 11, 9, 7, 8, 10, 13, 15, 12, 11, 9],
-    highlightIndex: 10
-  },
-  {
-    name: '上週',
-    color: '#EE7959',
-    data: [3, 5, 7, 9, 8, 10, 6, 4, 6, 9, 8, 10, 13, 11],
-    highlightIndex: 6
-  }
-])
+const chartData = [
+  { date: '2026-04-08', score: 70 },
+  { date: '2026-04-09', score: 55 },
+  { date: '2026-04-10', score: 70 },
+  { date: '2026-04-11', score: 62 },
+  { date: '2026-04-12', score: 20 }, // 低點 -> 藍點
+  { date: '2026-04-13', score: 48 },
+  { date: '2026-04-14', score: 72 }  // 今日 / 高點 -> 紅點
+  
+]
 </script>

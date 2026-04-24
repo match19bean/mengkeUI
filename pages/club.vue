@@ -11,13 +11,52 @@
       <!-- 課程卡片區域 -->
       <section class="space-y-4">
         <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
+          <!-- 未登入時顯示標題 -->
+          <div v-if="!isAuthenticated" class="space-y-1">
             <BaseTypography variant="h1" tag="h1" class="font-secondary text-brown-1">
               你的俱樂部課程
             </BaseTypography>
             <BaseTypography variant="subtitle" tag="p" class="font-primary color-subtitle">
               根據你的學習狀態，這些課程最適合你唷！
             </BaseTypography>
+          </div>
+          <!-- 登入後顯示分類按鈕 -->
+          <div v-else class="flex gap-3 flex-shrink-0">
+            <BaseButton 
+              variant="outline" 
+              size="medium"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-primary-1 !text-cream !border-transparent"
+            >
+              推薦課程
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="medium"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
+            >
+              單字文法
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="medium"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
+            >
+              檢定測驗
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="medium"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
+            >
+              口說發表
+            </BaseButton>
+            <BaseButton 
+              variant="outline" 
+              size="medium"
+              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
+            >
+              學習任務
+            </BaseButton>
           </div>
           <div class="flex gap-3 flex-shrink-0">
             <BaseButton 
@@ -120,12 +159,6 @@
               :completed="2"
               :total="12"
               progressColor="#4285F4"
-            />
-            <ClassProgressCard
-              title="法文基數"
-              :completed="2"
-              :total="12"
-              progressColor="#FFAFFF"
             />
           </div>
         </div>

@@ -5,7 +5,7 @@
       class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       @click.self="closePopup"
     >
-      <div class="bg-[#F8F7F0] rounded-3xl shadow-popup w-full max-w-[90vw] max-h-[90vh] overflow-hidden relative flex flex-col">
+      <div class="bg-[#F8F7F0] rounded-3xl shadow-popup w-full max-w-[75vw] max-h-[90vh] overflow-hidden relative flex flex-col">
         <!-- 關閉按鈕 -->
         <button 
           class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-brown-9 text-brown-3 cursor-pointer transition z-10" 
@@ -16,42 +16,30 @@
           </svg>
         </button>
 
-        <!-- Logo -->
-        <div class="pt-8 pb-4 px-8 flex-shrink-0">
-          <div class="flex justify-center mb-4">
-            <img src="/images/logo.png" alt="反轉外語" class="h-12 object-contain">
-          </div>
-          <h2 class="text-2xl font-genyogothic font-black text-center text-brown-1 tracking-wider">帳號資訊</h2>
-        </div>
-
-        <!-- 漸淡分隔線 -->
-        <div class="h-[1px] mx-8 mb-4 opacity-50" style="background: linear-gradient(to right, #501C1C00, #432C2C 50%, #501C1C00);"></div>
-
         <!-- 內容區域 (可滾動) -->
-        <div class="flex-1 overflow-y-auto px-8 pb-8">
-          <div class="py-4">
+        <div class="flex-1 overflow-y-auto px-12 p-4">
+          <div class="py-8">
             <div class="flex flex-col gap-8 lg:flex-row lg:gap-12">
               <!-- 左側：頭像 + 學習統計 -->
               <div class="w-full max-w-sm self-start space-y-6">
                 <div class="flex flex-col items-center gap-4 text-center">
-                  <div class="h-36 w-36 rounded-full border-4 border-white bg-gradient-to-b from-brown-8 to-brown-9 shadow-inner"></div>
+                  <div class="h-[200px] w-[200px] rounded-full border-4 border-white shadow-inner overflow-hidden bg-white flex items-center justify-center">
+                    <img :src="profile.avatar || '/images/logo.png'" alt="會員頭像" class="w-full h-full object-contain" />
+                  </div>
                   <div>
-                    <BaseTypography variant="h2" tag="h2" class="font-secondary text-brown-1">
+                    <BaseTypography variant="h2" tag="h2" class="font-secondary text-brown-5">
                       {{ profile.name }}
                     </BaseTypography>
-                    <p class="text-sm font-semibold text-brown-4">{{ profile.studentId }}</p>
+                    <p class="mt-4 text-body font-semibold text-brown-5">{{ profile.studentId }}</p>
                   </div>
                 </div>
 
                 <div class="space-y-4">
                   <div v-for="stat in learningStats" :key="stat.label" class="space-y-1">
                     <div class="flex items-center justify-between text-sm font-semibold">
-                      <p class="text-brown-3">{{ stat.label }}</p>
-                      <p class="text-brown-1">
-                        {{ stat.value }}<span class="text-xs text-brown-4">{{ stat.unit }}</span>
-                      </p>
+                      <p class="font-primary text-stat-label font-stat-label tracking-stat-label text-brown-3">{{ stat.label }} <span class="font-secondary text-stat-value font-stat-value tracking-stat-value text-brown-4">{{ stat.value }}</span>{{ stat.unit }}</p>    
                     </div>
-                    <div class="h-2 overflow-hidden rounded-full bg-white/80">
+                    <div class="h-3 overflow-hidden rounded-full bg-[#D9D9D9]">
                       <div
                         class="h-full rounded-full"
                         :style="{ width: getProgressWidth(stat.value, stat.max), backgroundColor: stat.color }"
@@ -63,23 +51,17 @@
                 <div class="grid gap-3 text-sm sm:grid-cols-2">
                   <button
                     type="button"
-                    class="flex items-center justify-center gap-2 rounded-full border border-brown-4/80 bg-white/40 px-4 py-2 font-semibold text-brown-2 shadow-sm transition hover:bg-white/70"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" />
-                      <path d="M8 5v3M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    師資查詢
+                    class="flex items-center justify-center gap-[10px] rounded-md bg-brown-7 px-md py-sm font-semibold text-cream shadow-sm transition"
+                  >                    
+                    師資更換
+                    <img src="/images/changeTeacher.png" alt="師資更換" width="16" height="16" />
                   </button>
                   <button
                     type="button"
-                    class="flex items-center justify-center gap-2 rounded-full border border-brown-4/80 bg-white/40 px-4 py-2 font-semibold text-brown-2 shadow-sm transition hover:bg-white/70"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3.5 2.5H10.5L12.5 4.5V13.5H3.5V2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M10.5 2.5V4.5H12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    class="flex items-center justify-center gap-[10px] rounded-md border border-brown-4/80 bg-brown-5 px-md py-sm font-semibold text-cream shadow-sm transition"
+                  >                    
                     報價單與契約
+                    <img src="/images/contractIcon.png" alt="報價單與契約" width="16" height="16" />
                   </button>
                 </div>
               </div>
@@ -92,7 +74,7 @@
                     :key="block.title"
                     :class="['space-y-4', index < infoBlocks.length - 1 ? 'border-b border-brown-8/60 pb-6' : '']"
                   >
-                    <BaseTypography variant="h4" tag="h3" class="font-secondary text-brown-2">
+                    <BaseTypography variant="h4" tag="h3" class="font-secondary text-brown-5">
                       {{ block.title }}
                     </BaseTypography>
 
@@ -100,40 +82,18 @@
                       <div
                         v-for="item in block.items"
                         :key="item.label"
-                        class="flex items-center gap-2 text-base font-semibold text-brown-2"
+                        :class="['flex items-center gap-2 text-base font-semibold text-brown-5', item.inlineAction ? 'ml-auto' : '']"
                       >
                         <span class="text-xs font-semibold tracking-[0.3em] text-brown-5">{{ item.label }}</span>
                         <span class="text-xs font-semibold text-brown-5">：</span>
-                        <span v-if="item.value && !item.inlineAction" class="text-brown-2">{{ item.value }}</span>
+                        <span v-if="item.value && !item.inlineAction" class="font-primary text-section-content font-section-content tracking-section-content">{{ item.value }}</span>
                         <button
                           v-if="item.inlineAction"
                           type="button"
-                          class="inline-flex items-center gap-2 rounded-full bg-brown-4/30 px-4 py-1.5 text-sm font-semibold text-brown-2 shadow-sm transition hover:bg-brown-4/40"
+                           class="flex items-center justify-center gap-[10px] rounded-md border border-brown-4/80 bg-brown-5 px-md py-sm text-sm font-semibold text-cream shadow-sm transition"
                         >
                           {{ item.inlineAction.label }}
-                          <svg
-                            v-if="item.inlineAction.icon === 'mail'"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            class="text-brown-2"
-                          >
-                            <path
-                              d="M2.5 4.5C2.5 3.67157 3.17157 3 4 3H12C12.8284 3 13.5 3.67157 13.5 4.5V11.5C13.5 12.3284 12.8284 13 12 13H4C3.17157 13 2.5 12.3284 2.5 11.5V4.5Z"
-                              stroke="currentColor"
-                              stroke-width="1.2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                            <path
-                              d="M2.5 5L8 8.5L13.5 5"
-                              stroke="currentColor"
-                              stroke-width="1.2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
+                          <img src="/images/mail.png" alt="密碼更改" width="16" height="16" />   
                         </button>
                         <span
                           v-if="item.badge"
@@ -146,7 +106,7 @@
 
                     <div
                       v-else-if="block.layout === 'stacked'"
-                      class="grid gap-y-3 text-xs font-semibold text-brown-2 xl:grid-cols-3"
+                      class="grid gap-y-5 text-xs font-semibold text-brown-5 xl:grid-cols-4"
                     >
                       <div
                         v-for="item in block.items"
@@ -155,19 +115,20 @@
                       >
                         <span class="text-xs font-semibold tracking-[0.3em] text-brown-5">{{ item.label }}</span>
                         <span class="text-xs font-semibold text-brown-5">：</span>
-                        <span v-if="item.value" class="text-xs font-semibold text-brown-2">{{ item.value }}</span>
+                        <span v-if="item.value" class="font-primary text-section-content font-section-content tracking-section-content">{{ item.value }}</span>
                       </div>
                     </div>
 
-                    <dl v-else class="grid gap-x-8 gap-y-3 text-sm text-brown-4 md:grid-cols-2">
+                    <dl v-else class="grid gap-x-8 gap-y-6 text-sm text-brown-4 md:grid-cols-2">
                       <div
                         v-for="item in block.items"
                         :key="item.label"
-                        :class="['space-y-1', item.fullWidth ? 'md:col-span-2' : '']"
+                        :class="['flex items-center gap-3', item.fullWidth ? 'md:col-span-2' : '']"
                       >
-                        <dt class="text-xs font-semibold tracking-[0.2em] text-brown-5">{{ item.label }}</dt>
-                        <dd class="flex flex-wrap items-center gap-2 text-base font-semibold text-brown-2">
-                          <span v-if="item.value">{{ item.value }}</span>
+                        <dt class="text-xs font-semibold tracking-[0.2em] text-brown-5 whitespace-nowrap">{{ item.label }}</dt>
+                        <span class="text-xs font-semibold text-brown-5">：</span>
+                        <dd class="flex flex-wrap items-center gap-2 text-base font-semibold text-brown-5">
+                          <span v-if="item.value" class="font-primary text-section-content font-section-content tracking-section-content">{{ item.value }}</span>
                           <span
                             v-if="item.badge"
                             :class="['rounded-full px-2.5 py-0.5 text-xs font-semibold', item.badge.class]"
@@ -177,7 +138,7 @@
                           <button
                             v-if="item.inlineAction"
                             type="button"
-                            class="inline-flex items-center rounded-full border border-brown-4/80 px-3 py-1 text-xs font-semibold text-brown-2 transition hover:bg-white/70"
+                            class="inline-flex items-center rounded-full border border-brown-4/80 px-3 py-1 text-xs font-semibold text-brown-2 transition"
                           >
                             {{ item.inlineAction.label }}
                           </button>
@@ -190,13 +151,11 @@
                 <div class="mt-6 flex justify-end">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-full border border-brown-4/80 bg-white/60 px-5 py-2 text-sm font-semibold text-brown-2 shadow-sm transition hover:bg-white/80"
+                    class="flex items-center justify-center gap-[10px] rounded-md border border-brown-4/80 bg-brown-5 px-md py-sm font-semibold text-cream shadow-sm transition"
                     @click="handleProfileUpdate"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M2 11.5V14H4.5L12.8733 5.62667L10.3733 3.12667L2 11.5Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                  >                    
                     資料更新
+                    <img src="/images/updateIcon.png" alt="資料更新" width="16" height="16" />                    
                   </button>
                 </div>
               </div>
@@ -265,8 +224,9 @@ const getProgressWidth = (value: number, max: number) => {
 
 // 個人資料資料
 const profile = {
-  name: '姜小文',
-  studentId: '2017010001'
+  name: 'User',
+  studentId: '2017010001',
+  avatar: '' // API 串接後填入頭像 URL
 }
 
 const learningStats: LearningStat[] = [
@@ -276,7 +236,7 @@ const learningStats: LearningStat[] = [
     max: 100,
     unit: ' 分',
     caption: '維持穩定出席與作業提交。',
-    color: '#EE7959'
+    color: '#FFC649'
   },
   {
     label: '學習契約剩餘',
@@ -284,7 +244,7 @@ const learningStats: LearningStat[] = [
     max: 400,
     unit: ' 天',
     caption: '課程剩餘天數，請保持進度。',
-    color: '#8C8074'
+    color: '#21A07D'
   },
   {
     label: '假期剩餘',
@@ -292,7 +252,7 @@ const learningStats: LearningStat[] = [
     max: 60,
     unit: ' 天',
     caption: '即將到期，可聯繫顧問續課。',
-    color: '#F2A74B'
+    color: '#A4A4A4'
   }
 ]
 
@@ -302,8 +262,7 @@ const infoBlocks: InfoBlock[] = [
     layout: 'inline',
     items: [
       { label: '使用者名稱', value: 'Maaku' },
-      { label: '登入密碼', value: '', inlineAction: { label: '密碼更改', icon: 'mail' } },
-      { label: '帳號權限', value: '學員 - 0' }
+      { label: '登入密碼', value: '', inlineAction: { label: '密碼更改', icon: 'mail' } }
     ]
   },
   {
@@ -323,9 +282,9 @@ const infoBlocks: InfoBlock[] = [
     title: '聯絡資訊',
     items: [
       { label: '地址', value: '桃園市 中壢區 320 中山路185號6樓', fullWidth: true },
-      { label: '手機號碼', value: '0912-345-678', badge: { text: '未綁定', class: 'bg-brown-9 text-brown-3 border border-brown-8' } },
-      { label: 'E-mail', value: 'mkreversal@gmail.com', badge: { text: '已驗證', class: 'bg-primary-1/15 text-primary-1' } },
-      { label: 'LINE綁定', value: '', badge: { text: '已綁定', class: 'bg-secondary-1/15 text-secondary-1' } }
+      { label: '手機號碼', value: '0912-345-678', badge: { text: '未驗證', class: 'bg-brown-9 text-brown-3 border border-brown-8' } },
+      { label: 'E-mail', value: 'mkreversal@gmail.com', badge: { text: '已驗證', class: 'bg-primary-1 text-cream' } },
+      { label: 'LINE綁定', value: '', badge: { text: '已綁定', class: 'bg-line text-cream' } }
     ]
   },
   {
@@ -333,7 +292,7 @@ const infoBlocks: InfoBlock[] = [
     items: [
       { label: '欲學習的語言別', value: '日文' },
       { label: '學習語言的目的', value: '興趣、工作需求' },
-      { label: '欲達到的目標', value: '0912-345-678' },
+      { label: '欲達到的目標', value: 'C1' },
       { label: '目前的程度', value: 'A1' }
     ]
   }

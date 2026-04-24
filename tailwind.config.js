@@ -9,14 +9,16 @@ export default {
   ],
   safelist: [
     {
-      pattern: /(bg|text|border)-(primary|secondary|alert|complementary|brown)-(1|2|3|4|5|6|7|8|9|10)/,
+      pattern: /(bg|text|border)-(primary|secondary|alert|complementary|brown)-(1|2|3|4|5|6|7|8|9|10|30)/,
     },
     {
-      pattern: /text-(h1|h2|h3|h4|h5|title|subtitle|body|caption|small|button-s|button-m|button-l)/,
+      pattern: /text-(h1|h2|h3|h4|h5|title|subtitle|body|caption|small|button-s|button-m|button-l|section-heading|section-content|stat-value|stat-label)/,
     },
     'bg-cream',
     'text-cream',
     'border-cream',
+    'bg-line',
+    'text-line',
   ],
   theme: {
     extend: {
@@ -53,9 +55,12 @@ export default {
           8: '#CDC7BE',
           9: '#E2DFD7',
           10: '#F8F7F0',
+          30: '#3620104D',
         },
         cream: '#F8F7F0',
         subtitle: '#8A8A8A',
+        'section-heading': '#36201080',
+        line: '#06C755',
       },
       fontFamily: {
         primary: ['Noto Sans TC', 'sans-serif'],
@@ -79,6 +84,22 @@ export default {
         'calendar-s': '12px',
         'calendar-m': '14px',
         'calendar-l': '16px',
+        'section-heading': ['16px', { lineHeight: '16px' }],
+        'section-content': ['12px', { lineHeight: '16px' }],
+        'stat-value': ['16px', { lineHeight: '12px' }],
+        'stat-label': ['12px', { lineHeight: '22px' }],
+      },
+      letterSpacing: {
+        'section-heading': '2px',
+        'section-content': '2px',
+        'stat-value': '0px',
+        'stat-label': '0px',
+      },
+      fontWeight: {
+        'section-heading': '900',
+        'section-content': '500',
+        'stat-value': '900',
+        'stat-label': '500',
       },
       spacing: {
         'xs': '4px',

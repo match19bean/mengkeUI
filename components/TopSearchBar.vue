@@ -3,7 +3,7 @@
     <BaseSearchInput 
       v-model="searchQuery" 
       placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等" 
-      :suggestions="suggestions"
+      :suggestions="displaySuggestions"
       @select="handleSearchSelect"
     />
     <div class="flex items-center gap-4">
@@ -30,31 +30,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const { isAuthenticated, logout } = useAuth()
+const { getSearchSuggestions, suggestions, pending } = useSearchStore()
 
-interface Props {
-  suggestions?: any[]
-  modelValue?: string
-}
+// 內部管理搜尋輸入
+const searchQuery = ref('')
 
-const props = withDefaults(defineProps<Props>(), {
-  suggestions: () => [],
-  modelValue: ''
+// 格式化建議以符合 BaseSearchInput 的格式
+const displaySuggestions = computed(() => {
+  return suggestions.value.map(text => ({
+    title: text,
+    url: `/search?q=${encodeURIComponent(text)}`,
+    type: '搜尋結果',
+    badge: '課程',
+    badgeColor: 'primary',
+    selectable: true
+  }))
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string]
-  'search': [query: string]
-  'select': [suggestion: any]
-}>()
+// 簡單的 debounce 實作
+let debounceTimer: NodeJS.Timeout | null = null
+const debouncedSearch = (query: string) => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+  
+  debounceTimer = setTimeout(async () => {
+    if (query.trim().length >= 2) {
+      await getSearchSuggestions({ query, limit: 5 })
+    } else {
+      suggestions.value = []
+    }
+  }, 300)
+}
 
-const searchQuery = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+watch(searchQuery, (newQuery) => {
+  debouncedSearch(newQuery)
+})
+
+// 清理定時器
+onBeforeUnmount(() => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
 })
 
 const handleLogout = () => {
@@ -63,7 +85,6 @@ const handleLogout = () => {
 }
 
 const handleSearchSelect = (suggestion: any) => {
-  emit('select', suggestion)
   if (suggestion && suggestion.url && suggestion.selectable !== false) {
     router.push(suggestion.url)
   }
