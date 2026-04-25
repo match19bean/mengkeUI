@@ -93,7 +93,7 @@ export default {
         'section-heading': '2px',
         'section-content': '2px',
         'stat-value': '0px',
-        'stat-label': '0px',
+        'stat-label': '0px'
       },
       fontWeight: {
         'section-heading': '900',

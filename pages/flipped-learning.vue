@@ -58,7 +58,7 @@
         </div>
       </section>
       
-      <div class="max-w-[460px] space-y-4">
+      <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <LearningCycleCard
           title="學習週期"
           :score="50"
@@ -69,8 +69,12 @@
           :progress="84"
           start-date="11/1"
           end-date="11/28"
-          @action-click="handleCycleAction"
+          scenario-status="請進行諮商預約"
         />
+
+        <CurrentLearningPanel :items="currentLearningItems" />
+
+        <LearningHistoryPanel :items="learningHistoryItems" />
       </div>
     </div>
   </div>
@@ -83,6 +87,8 @@ import LearningCurveChart from '~/components/LearningCurveChart.vue'
 import RadarChart from '@/components/RadarChart.vue'
 import CourseDropdown from '~/components/CourseDropdown.vue'
 import LearningCycleCard from '~/components/LearningCycleCard.vue'
+import CurrentLearningPanel from '~/components/CurrentLearningPanel.vue'
+import LearningHistoryPanel from '~/components/LearningHistoryPanel.vue'
 
 interface RadarDataItem {
   label: string
@@ -97,10 +103,6 @@ const selectedCourse = ref<string | number | null>(null)
 
 const handleCourseChange = (item: { label: string; value: string | number }) => {
   console.log('目前選擇:', item)
-}
-
-const handleCycleAction = (state: string) => {
-  console.log('learning cycle action:', state)
 }
 
 const consultationProgressText = ref('1/3')
@@ -190,5 +192,48 @@ const chartData = [
   { date: '2026-04-13', score: 48 },
   { date: '2026-04-14', score: 72 }  // 今日 / 高點 -> 紅點
   
+]
+
+const currentLearningItems = [
+  {
+    title: '快朗',
+    actionText: '預約或上傳音檔',
+    actionClass: 'bg-primary-2 text-white',
+    current: 3,
+    total: 5,
+    unit: '篇',
+    progressClass: 'bg-primary-2'
+  },
+  {
+    title: '組織圖',
+    current: 7,
+    total: 20,
+    unit: '篇',
+    progressClass: 'bg-complementary-1'
+  },
+  {
+    title: '關鍵字',
+    current: 10,
+    total: 16,
+    unit: '篇',
+    progressClass: 'bg-secondary-1'
+  },
+  {
+    title: '必修課',
+    actionText: '前往聚樂部',
+    actionClass: 'bg-complementary-2 text-white',
+    current: 6,
+    total: 8,
+    unit: '堂',
+    progressClass: 'bg-complementary-2'
+  }
+]
+
+const learningHistoryItems = [
+  { title: '快朗', tags: ['聽力', '口說'], time: '今天 08:31' },
+  { title: '組織圖', tags: ['閱讀', '邏輯', '記憶'], time: '昨天 15:31' },
+  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
+  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
+  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' }
 ]
 </script>

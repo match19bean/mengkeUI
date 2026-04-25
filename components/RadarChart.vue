@@ -1,5 +1,5 @@
 <template>
-  <div class="min-w-[350px] w-full h-full bg-brown-10 rounded-[24px] p-6 shadow-2xl border border-brown-8" style="background-color: #F8F7F0;">
+  <div class="min-w-[350px] w-full h-full bg-brown-10 rounded-[24px] p-6 shadow-2xl border " style="background-color: #F8F7F0;">
     <!-- 雷達圖 -->
     <div class="relative w-full aspect-square max-w-[320px] mx-auto">
       <svg viewBox="0 0 260 260" class="w-full h-full overflow-visible">

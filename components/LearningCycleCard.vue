@@ -90,15 +90,29 @@
       </div>
     </div>
 
-    <BaseButton
-      variant="outline"
-      size="medium"
-      :disabled="actionState.disabled"
-      :class="actionState.className"
-      @click="handleActionClick"
+    <div
+      class="grid gap-3"
+      :class="actionButtons.length > 1 ? 'grid-cols-2' : 'grid-cols-1'"
     >
-      {{ actionState.label }}
-    </BaseButton>
+      <BaseButton
+        v-for="button in actionButtons"
+        :key="button.key"
+        variant="outline"
+        size="medium"
+        :class="button.className"
+        @click="handleActionClick(button)"
+      >
+        <span>{{ button.label }}</span>
+        <img
+          v-if="button.iconSrc"
+          :src="button.iconSrc"
+          :alt="button.iconAlt"
+          width="14"
+          height="14"
+          class="h-[14px] w-[14px] flex-shrink-0"
+        />
+      </BaseButton>
+    </div>
   </div>
 </template>
 
@@ -106,6 +120,7 @@
 import { computed } from 'vue'
 
 type LearningCycleState = 'waiting-test-start' | 'taking-test' | 'waiting-analysis' | 'booking-consultation'
+type LearningCycleScenario = '等待測驗開始' | '請進行測驗' | '等待分析結束' | '請進行諮商預約'
 
 interface CycleStateConfig {
   phaseLabel: string
@@ -113,6 +128,16 @@ interface CycleStateConfig {
   label: string
   disabled: boolean
   className: string
+}
+
+interface ActionButtonConfig {
+  key: string
+  label: string
+  className: string
+  iconSrc?: string
+  iconAlt?: string
+  disabled?: boolean
+  targetState: LearningCycleState
 }
 
 const props = withDefaults(
@@ -124,6 +149,7 @@ const props = withDefaults(
     phaseNumber?: number | string
     statusText?: string
     cycleState?: LearningCycleState
+    scenarioStatus?: LearningCycleScenario
     remainingDays?: number
     progress?: number
     startDate?: string
@@ -142,9 +168,12 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits<{
-  actionClick: [state: LearningCycleState]
-}>()
+const scenarioToCycleStateMap: Record<LearningCycleScenario, LearningCycleState> = {
+  '等待測驗開始': 'waiting-test-start',
+  '請進行測驗': 'taking-test',
+  '等待分析結束': 'waiting-analysis',
+  '請進行諮商預約': 'booking-consultation'
+}
 
 const cycleStateMap: Record<LearningCycleState, CycleStateConfig> = {
   'waiting-test-start': {
@@ -177,7 +206,90 @@ const cycleStateMap: Record<LearningCycleState, CycleStateConfig> = {
   }
 }
 
-const actionState = computed(() => cycleStateMap[props.cycleState])
+const resolvedCycleState = computed<LearningCycleState>(() => {
+  if (props.scenarioStatus) {
+    return scenarioToCycleStateMap[props.scenarioStatus]
+  }
+
+  return props.cycleState
+})
+
+const actionState = computed(() => cycleStateMap[resolvedCycleState.value])
+
+const actionButtons = computed<ActionButtonConfig[]>(() => {
+  switch (resolvedCycleState.value) {
+    case 'waiting-test-start':
+      return [
+        {
+          key: 'test-not-open',
+          label: '測驗尚未開始',
+          className: '!w-full !bg-brown-9 !text-white/60 !border-transparent !cursor-not-allowed',
+          disabled: true,
+          targetState: 'waiting-test-start'
+        }
+      ]
+    case 'taking-test':
+      return [
+        {
+          key: 'go-test',
+          label: '進行測驗',
+          className: '!w-full !bg-primary-2 !text-cream !border-transparent',
+          iconSrc: '/images/gotest.png',
+          iconAlt: 'go test',
+          targetState: 'taking-test'
+        }
+      ]
+    case 'waiting-analysis':
+      return [
+        {
+          key: 'report-disabled',
+          label: '本期分析書',
+          className: '!w-full !bg-brown-9 !text-white/60 !border-transparent !cursor-not-allowed',
+          iconSrc: '/images/lock.svg',
+          iconAlt: 'locked',
+          disabled: true,
+          targetState: 'waiting-analysis'
+        },
+        {
+          key: 'book-consultation',
+          label: '諮商預約',
+          className: '!w-full !bg-alert-1 !text-cream !border-transparent',
+          iconSrc: '/images/calendar.png',
+          iconAlt: 'calendar',
+          targetState: 'booking-consultation'
+        }
+      ]
+    case 'booking-consultation':
+      return [
+        {
+          key: 'view-report',
+          label: '本期分析書',
+          className: '!w-full !bg-primary-2 !text-cream !border-transparent',
+          iconSrc: '/images/goreport.png',
+          iconAlt: 'go report',
+          targetState: 'waiting-analysis'
+        },
+        {
+          key: 'book-consultation',
+          label: '諮商預約',
+          className: '!w-full !bg-alert-1 !text-cream !border-transparent',
+          iconSrc: '/images/calendar.png',
+          iconAlt: 'calendar',
+          targetState: 'booking-consultation'
+        }
+      ]
+    default:
+      return [
+        {
+          key: 'default',
+          label: actionState.value.label,
+          className: actionState.value.className,
+          disabled: actionState.value.disabled,
+          targetState: resolvedCycleState.value
+        }
+      ]
+  }
+})
 
 const displayPhaseLabel = computed(() => props.phaseLabel ?? actionState.value.phaseLabel)
 
@@ -199,9 +311,21 @@ const progressOffset = computed(() => {
   return circumference * (1 - percent)
 })
 
-const handleActionClick = () => {
-  if (actionState.value.disabled)
+const handleActionClick = (button: ActionButtonConfig) => {
+  if (button.disabled)
     return
-  emit('actionClick', props.cycleState)
+
+  const routeByActionKey: Partial<Record<ActionButtonConfig['key'], string>> = {
+    'go-test': '/learning-task',
+    'book-consultation': '/consultation',
+    // Currently no dedicated report page; route to learning task as report entry.
+    'view-report': '/learning-task'
+  }
+
+  const targetPath = routeByActionKey[button.key]
+  if (!targetPath)
+    return
+
+  navigateTo(targetPath)
 }
 </script>
