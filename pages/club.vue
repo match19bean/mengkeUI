@@ -20,43 +20,41 @@
               根據你的學習狀態，這些課程最適合你唷！
             </BaseTypography>
           </div>
-          <!-- 登入後顯示分類按鈕 -->
-          <div v-else class="flex gap-3 flex-shrink-0">
-            <BaseButton 
-              variant="outline" 
-              size="medium"
-              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-primary-1 !text-cream !border-transparent"
-            >
-              推薦課程
-            </BaseButton>
-            <BaseButton 
-              variant="outline" 
-              size="medium"
-              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
-            >
-              單字文法
-            </BaseButton>
-            <BaseButton 
-              variant="outline" 
-              size="medium"
-              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
-            >
-              檢定測驗
-            </BaseButton>
-            <BaseButton 
-              variant="outline" 
-              size="medium"
-              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
-            >
-              口說發表
-            </BaseButton>
-            <BaseButton 
-              variant="outline" 
-              size="medium"
-              class="!rounded-lg !pt-[9px] !pb-[9px] !bg-brown-1/50 !text-cream !border-transparent"
-            >
-              學習任務
-            </BaseButton>
+          <!-- 登入後顯示分類按鈕與語系下拉 -->
+          <div v-else class="flex items-center gap-3 flex-shrink-0">
+           <div class="w-[128px]">
+              <div class="p-1">
+                <BaseDropdown
+                  v-model="selectedLanguage"
+                  :options="languageOptions"
+                  placeholder="全語系"
+                  class="dropdown-pill"
+                  height="50px"
+                  fontSize="15px"
+                  fontWeight="900"
+                  borderRadius="16px"
+                  menuBorderRadius="16px"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 rounded-full p-1">
+              <BaseButton
+                v-for="tab in courseCategoryTabs"
+                :key="tab.value"
+                variant="outline"
+                size="medium"
+                class="!rounded-xl !px-5 !py-2.5 !border-transparent !shadow-lg !transition"
+                :class="
+                  selectedCourseCategory === tab.value
+                    ? '!bg-brown-1 !text-cream'
+                    : '!bg-transparent !text-brown-1 !bg-white/70 '
+                "
+                @click="selectedCourseCategory = tab.value"
+              >
+                {{ tab.label }}
+              </BaseButton>
+            </div>
           </div>
           <div class="flex gap-3 flex-shrink-0">
             <BaseButton 
@@ -191,6 +189,36 @@ interface Course {
   canEnterCourse: boolean
   enterButtonText?: string
 }
+
+type CourseCategory = 'recommend' | 'vocabulary-grammar' | 'exam' | 'speaking' | 'task'
+type LanguageFilter = 'japanese' | 'english' | 'all'
+
+interface CourseCategoryTab {
+  label: string
+  value: CourseCategory
+}
+
+interface LanguageOption {
+  label: string
+  value: LanguageFilter
+}
+
+const selectedCourseCategory = ref<CourseCategory>('recommend')
+const selectedLanguage = ref<LanguageFilter>('all')
+
+const courseCategoryTabs: CourseCategoryTab[] = [
+  { label: '推薦課程', value: 'recommend' },
+  { label: '單字文法', value: 'vocabulary-grammar' },
+  { label: '檢定測驗', value: 'exam' },
+  { label: '口說發表', value: 'speaking' },
+  { label: '學習任務', value: 'task' }
+]
+
+const languageOptions: LanguageOption[] = [
+  { label: '全語系', value: 'all' },
+  { label: '日文', value: 'japanese' },
+  { label: '英文', value: 'english' }
+]
 
 // 課程數據
 const courses = ref<Course[]>([

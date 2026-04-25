@@ -1,5 +1,5 @@
 <template>
-  <header class="flex items-center justify-between gap-4">
+  <header class="flex items-center justify-between gap-4 pb-5 ">
     <BaseSearchInput 
       v-model="searchQuery" 
       placeholder="搜尋課程標籤、話題、教材、學習方法或教導等等" 

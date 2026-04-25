@@ -1,12 +1,13 @@
 <template>
-  <div class="relative inline-block w-full" ref="dropdownRef">
+  <div class="relative inline-block w-full" ref="dropdownRef" :style="containerInlineStyles">
     <div
       :class="selectClasses"
+      :style="selectInlineStyles"
       @click="toggleDropdown"
       tabindex="0"
       @blur="handleBlur"
     >
-      <span :class="displayTextClasses" class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ displayValue }}</span>
+      <span :class="displayTextClasses" :style="textInlineStyles" class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ displayValue }}</span>
       <svg
         :class="iconClasses"
         width="12"
@@ -23,11 +24,16 @@
         />
       </svg>
     </div>
-    <div v-if="isOpen && !disabled" class="absolute top-full mt-2 left-0 right-0 bg-[#F8F7F0] rounded-2xl shadow-lg max-h-60 overflow-y-auto z-50 py-2">
+    <div
+      v-if="isOpen && !disabled"
+      class="absolute top-full mt-2 left-0 right-0 bg-[#F8F7F0] shadow-lg max-h-60 overflow-y-auto z-50 py-2"
+      :style="menuInlineStyles"
+    >
       <div
         v-for="option in options"
         :key="option.value"
         :class="getItemClasses(option)"
+        :style="textInlineStyles"
         @mousedown.prevent="selectOption(option)"
       >
         {{ option.label }}
@@ -48,6 +54,12 @@ interface Props {
   modelValue?: string | number | (string | number)[]
   options: Option[]
   placeholder?: string
+  width?: string
+  height?: string
+  fontSize?: string
+  fontWeight?: string | number
+  borderRadius?: string
+  menuBorderRadius?: string
   disabled?: boolean
   error?: boolean
   multiple?: boolean
@@ -55,6 +67,11 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: '請選擇',
+  width: '100%',
+  height: '32px',
+  fontSize: '12px',
+  borderRadius: '32px',
+  menuBorderRadius: '16px',
   disabled: false,
   error: false,
   multiple: false
@@ -89,7 +106,7 @@ const displayTextClasses = computed(() => {
 })
 
 const selectClasses = computed(() => {
-  const baseClasses = 'flex items-center justify-between h-[32px] px-4 bg-[#36201019] rounded-[32px] cursor-pointer transition-all duration-250'
+  const baseClasses = 'flex items-center justify-between px-4 bg-[#36201019] cursor-pointer transition-all duration-250'
   const normalClasses = 'hover:bg-[#36201026] border-0'
   const openClasses = 'bg-[#36201026] border-0'
   const errorClasses = 'border border-alert-1'
@@ -107,6 +124,24 @@ const iconClasses = computed(() => {
   
   return [baseClasses, rotateClasses].filter(Boolean).join(' ')
 })
+
+const containerInlineStyles = computed(() => ({
+  width: props.width
+}))
+
+const selectInlineStyles = computed(() => ({
+  height: props.height,
+  borderRadius: props.borderRadius
+}))
+
+const textInlineStyles = computed(() => ({
+  fontSize: props.fontSize,
+  fontWeight: props.fontWeight
+}))
+
+const menuInlineStyles = computed(() => ({
+  borderRadius: props.menuBorderRadius
+}))
 
 const getItemClasses = (option: Option) => {
   const baseClasses = 'px-4 py-2.5 text-xs text-brown-1 cursor-pointer transition-colors duration-150 text-center tracking-[2px]'

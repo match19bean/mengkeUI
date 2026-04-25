@@ -23,9 +23,25 @@
               <!-- 左側：頭像 + 學習統計 -->
               <div class="w-full max-w-sm self-start space-y-6">
                 <div class="flex flex-col items-center gap-4 text-center">
-                  <div class="h-[200px] w-[200px] rounded-full border-4 border-white shadow-inner overflow-hidden bg-white flex items-center justify-center">
-                    <img :src="profile.avatar || '/images/logo.png'" alt="會員頭像" class="w-full h-full object-contain" />
-                  </div>
+                  <button
+                    type="button"
+                    class="group relative h-[200px] w-[200px] cursor-pointer rounded-full border-4 border-white bg-white shadow-inner overflow-hidden"
+                    @click="openAvatarPicker"
+                  >
+                    <img :src="profile.avatar || '/images/logo.png'" alt="會員頭像" class="h-full w-full object-contain" />
+                    <span class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/25 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <span class="flex h-10 w-10 items-center justify-center rounded-full">
+                        <img src="/images/updateIcon.png" alt="更換頭像" width="18" height="18" />
+                      </span>
+                    </span>
+                  </button>
+                  <input
+                    ref="avatarInputRef"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleAvatarChange"
+                  />
                   <div>
                     <BaseTypography variant="h2" tag="h2" class="font-secondary text-brown-5">
                       {{ profile.name }}
@@ -168,6 +184,8 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount, ref } from 'vue'
+
 interface LearningStat {
   label: string
   value: number
@@ -223,11 +241,37 @@ const getProgressWidth = (value: number, max: number) => {
 }
 
 // 個人資料資料
-const profile = {
+const profile = ref({
   name: 'User',
   studentId: '2017010001',
   avatar: '' // API 串接後填入頭像 URL
+})
+
+const avatarInputRef = ref<HTMLInputElement | null>(null)
+let previewAvatarUrl: string | null = null
+
+const openAvatarPicker = () => {
+  avatarInputRef.value?.click()
 }
+
+const handleAvatarChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file || !file.type.startsWith('image/')) return
+
+  if (previewAvatarUrl) {
+    URL.revokeObjectURL(previewAvatarUrl)
+  }
+
+  previewAvatarUrl = URL.createObjectURL(file)
+  profile.value.avatar = previewAvatarUrl
+}
+
+onBeforeUnmount(() => {
+  if (previewAvatarUrl) {
+    URL.revokeObjectURL(previewAvatarUrl)
+  }
+})
 
 const learningStats: LearningStat[] = [
   {
