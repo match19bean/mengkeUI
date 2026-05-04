@@ -32,9 +32,7 @@
             :aria-label="`${item.title} 詳細`"
           >
             <span aria-hidden="true">
-                <svg width="25" height="25" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
-                    <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
+                <IconsChevronRight :size="25" :stroke-width="1.5" />
             </span>
         </button>
       </article>

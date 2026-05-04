@@ -61,9 +61,7 @@
                   class="w-[135px] flex items-center justify-between px-4 py-2 border-[1.5px] border-brown-1 rounded-[12px] text-brown-1 text-button-s font-semibold hover:bg-brown-9/30 transition-colors"
                 >
                   <span class="font-extrabold flex-1 text-center">聚樂部</span>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0">
-                    <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
+                  <IconsChevronRight />
                 </NuxtLink>
               </div>
 

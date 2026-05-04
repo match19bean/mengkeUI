@@ -102,6 +102,7 @@
                 :can-enter-course="course.canEnterCourse"
                 :enter-button-text="course.enterButtonText"
                 @toggle-bookmark="toggleCourseBookmark(course.id)"
+                @view-detail="openClubCoursePopup(course)"
               />
             </div>
           </div>
@@ -161,15 +162,21 @@
           </div>
         </div>
       </section>
+
+      <ClubCoursePopup
+        v-model="isClubCoursePopupOpen"
+        :course-id="activeCourse?.id"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import ClassProgressCard from '@/components/ClassProgressCard.vue'
+import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
@@ -205,6 +212,8 @@ interface LanguageOption {
 
 const selectedCourseCategory = ref<CourseCategory>('recommend')
 const selectedLanguage = ref<LanguageFilter>('all')
+const isClubCoursePopupOpen = ref(false)
+const activeCourse = ref<Course | null>(null)
 
 const courseCategoryTabs: CourseCategoryTab[] = [
   { label: '推薦課程', value: 'recommend' },
@@ -324,6 +333,11 @@ const courseBookmarks = ref<Record<string, boolean>>({
 
 const toggleCourseBookmark = (courseId: string) => {
   courseBookmarks.value[courseId] = !courseBookmarks.value[courseId]
+}
+
+const openClubCoursePopup = (course: Course) => {
+  activeCourse.value = course
+  isClubCoursePopupOpen.value = true
 }
 
 // 搜尋相關

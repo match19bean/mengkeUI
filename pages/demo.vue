@@ -289,6 +289,12 @@
         </div>
         
       </section>
+
+      <section class="bg-white/90 border border-brown-8 rounded-[32px] p-8 shadow-[0_18px_48px_rgba(0,0,0,0.08)] space-y-4">
+        <BaseTypography variant="title" tag="h2" class="text-brown-2">ClubCoursePopup</BaseTypography>
+        <BaseButton variant="primary" size="medium" @click="isClubCoursePopupOpen = true">開啟課程彈窗預覽</BaseButton>
+        <ClubCoursePopup v-model="isClubCoursePopupOpen" />
+      </section>
     </div>
   </div>
 </template>
@@ -300,6 +306,9 @@ type FrequencyCardValue = number | string
 
 import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
 import Popup from '@/components/Popup.vue'
+import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
+
+const isClubCoursePopupOpen = ref(false)
 
 const circleStatsItems = [
   { value: 14, label: '快朗', color: '#D95847', maxValue: 20 },
