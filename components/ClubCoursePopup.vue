@@ -102,7 +102,14 @@
                 @click="goalOpen = !goalOpen"
               >
                 <h3 class="font-secondary text-[28px] font-black text-brown-1">課程目標</h3>
-                <span class="text-2xl leading-none text-brown-3">{{ goalOpen ? '−' : '+' }}</span>
+                <span class="inline-flex h-6 w-6 items-center justify-center text-brown-3">
+                  <IconsChevronRight
+                    :size="18"
+                    :stroke-width="2"
+                    class="transition-transform duration-200"
+                    :class="goalOpen ? 'rotate-90' : '-rotate-90'"
+                  />
+                </span>
               </button>
               <div v-if="goalOpen" class="mt-4 border-t border-brown-8/60 pt-4 text-sm leading-7 text-brown-2">
                 <div v-html="courseHero.goal"></div>
@@ -116,7 +123,14 @@
                 @click="introOpen = !introOpen"
               >
                 <h3 class="font-secondary text-[28px] font-black text-brown-1">課程介紹與規劃</h3>
-                <span class="text-2xl leading-none text-brown-3">{{ introOpen ? '−' : '+' }}</span>
+                <span class="inline-flex h-6 w-6 items-center justify-center text-brown-3">
+                  <IconsChevronRight
+                    :size="18"
+                    :stroke-width="2"
+                    class="transition-transform duration-200"
+                    :class="introOpen ? 'rotate-90' : '-rotate-90'"
+                  />
+                </span>
               </button>
               <div v-if="introOpen" class="mt-4 border-t border-brown-8/60 pt-4 text-sm leading-7 text-brown-2">
                 <div v-html="courseHero.intro"></div>
@@ -175,7 +189,7 @@
                 >
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                      <h4 class="text-xl font-black text-brown-1">{{ item.title }}</h4>
+                      <h4 class="text-xl font-black text-brown-5">{{ item.title }}</h4>
                       <span class="text-sm font-semibold text-brown-5">{{ item.date }}</span>
                     </div>
                     <div class="mt-2 flex flex-wrap gap-2">
@@ -189,11 +203,15 @@
                     </div>
                   </div>
 
-                  <p class="text-lg font-black text-brown-3">課程時長 {{ item.duration }} 分鐘</p>
+                  <p class="text-lg font-black text-brown-5">
+                    課程時長
+                    <span class="inline-block font-geny ogothic text-[36px] leading-[36px] tracking-[0px]">{{ item.duration }}</span>
+                    分鐘
+                  </p>
 
                   <div class="flex gap-2">
-                    <BaseButton variant="brown-soft" size="small" class="!h-10 !rounded-xl !px-6 !text-sm">課程回放</BaseButton>
-                    <BaseButton variant="brown-soft" size="small" class="!h-10 !rounded-xl !px-6 !text-sm">教材下載</BaseButton>
+                    <BaseButton variant="brown-soft" size="small" class="!h-10 !rounded-xl !px-10 !text-sm">課程回放</BaseButton>
+                    <BaseButton variant="brown-soft" size="small" class="!h-10 !rounded-xl !px-10 !text-sm">教材下載</BaseButton>
                   </div>
                 </article>
               </div>

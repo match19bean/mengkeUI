@@ -164,22 +164,24 @@
       </section>
 
       <ClubCoursePopup
-        v-model="isClubCoursePopupOpen"
+        :model-value="isClubCoursePopupOpen"
         :course-id="activeCourse?.id"
+        @update:model-value="(val) => { if (!val) closeClubCoursePopup(); else isClubCoursePopupOpen = true }"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import ClassProgressCard from '@/components/ClassProgressCard.vue'
 import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const route = useRoute()
 const { token } = useAuth()
 const isAuthenticated = computed(() => !!token.value)
 
@@ -214,6 +216,14 @@ const selectedCourseCategory = ref<CourseCategory>('recommend')
 const selectedLanguage = ref<LanguageFilter>('all')
 const isClubCoursePopupOpen = ref(false)
 const activeCourse = ref<Course | null>(null)
+
+onMounted(() => {
+  const courseQueryId = route.query.course as string | undefined
+  if (courseQueryId) {
+    activeCourse.value = { id: courseQueryId } as Course
+    isClubCoursePopupOpen.value = true
+  }
+})
 
 const courseCategoryTabs: CourseCategoryTab[] = [
   { label: '推薦課程', value: 'recommend' },
@@ -338,6 +348,14 @@ const toggleCourseBookmark = (courseId: string) => {
 const openClubCoursePopup = (course: Course) => {
   activeCourse.value = course
   isClubCoursePopupOpen.value = true
+  router.replace({ query: { ...route.query, course: course.id } })
+}
+
+const closeClubCoursePopup = () => {
+  isClubCoursePopupOpen.value = false
+  activeCourse.value = null
+  const { course: _removed, ...restQuery } = route.query
+  router.replace({ query: restQuery })
 }
 
 // 搜尋相關
