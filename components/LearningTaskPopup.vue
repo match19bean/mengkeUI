@@ -1,0 +1,402 @@
+<template>
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-[9999] bg-black/40 p-2 backdrop-blur-sm md:p-4 lg:p-6"
+        @click.self="closePopup"
+      >
+        <div class="mx-auto flex h-[95vh] w-full max-w-[1540px] flex-col overflow-hidden rounded-[28px] border border-brown-8 bg-cream shadow-[0_12px_30px_rgba(54,32,16,0.14)]">
+          <div class="flex shrink-0 justify-end px-4 pt-4 md:px-6">
+            <button
+              type="button"
+              class="flex h-9 w-9 items-center justify-center rounded-full text-brown-2 transition hover:bg-brown-9"
+              aria-label="關閉"
+              @click="closePopup"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <path d="M6 6l8 8M14 6l-8 8" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="popup-scroll min-h-0 flex-1 overflow-y-auto px-4 pb-6 md:px-6 lg:px-8 lg:pb-8">
+            <section class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div class="flex min-w-0 flex-1 items-center gap-4 md:gap-6">
+                <div class="h-[160px] w-[268px] rounded-[24px] bg-brown-7/70" />
+                <h1 class="font-genyogothic text-[44px] font-black leading-none text-brown-1">{{ taskTitle }}</h1>
+              </div>
+
+              <div class="w-full max-w-[230px]">
+                <div class="mb-3 flex items-center justify-between gap-3 px-1">
+                  <p class="text-right font-genyogothic text-[16px] font-black leading-[22px] tracking-[0px] text-brown-1">任務難度</p>
+                  <div class="flex gap-1">
+                    <span
+                      v-for="star in 5"
+                      :key="star"
+                      class="text-[25px]"
+                      :class="star <= filledTaskStars ? 'text-[#f5c44a]' : 'text-brown-7'"
+                    >
+                      ★
+                    </span>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-brown-1 p-4 text-cream shadow-lg">
+                  <div class="my-5 flex items-end justify-center gap-2 leading-none">
+                    <span class="inline-block min-w-[64px] text-right font-genyogothic text-[64px] font-black leading-[40px] tracking-[0px]">{{ taskProgress.current }}</span>
+                    <span class="self-end text-[22px] font-black leading-none text-brown-8">/ {{ taskProgress.total }}</span>
+                    <span class="self-end text-[13px] font-semibold leading-none text-brown-8">篇</span>
+                  </div>
+
+                  <p class="mt-1 text-center text-[12px] font-semibold text-brown-8">{{ taskProgress.label }}</p>
+
+                  <div class="mt-3 h-[7px] w-full overflow-hidden rounded-full bg-brown-8">
+                    <div class="h-full rounded-full bg-secondary-1" :style="{ width: `${taskProgress.percent}%` }" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-4 grid grid-cols-12 gap-2 md:gap-4">
+              <BaseButton variant="secondary" size="small" class="col-span-12 !h-11 !rounded-xl !text-sm md:col-span-8">
+                學習回顧
+              </BaseButton>
+              <BaseButton variant="secondary" size="small" class="col-span-8 !h-11 !rounded-xl !text-sm md:col-span-3">
+                教材下載
+              </BaseButton>
+              <button
+                type="button"
+                class="col-span-4 inline-flex h-11 items-center justify-center gap-1 rounded-xl bg-complementary-1 px-3 text-sm font-black text-cream transition hover:opacity-85 md:col-span-1"
+                @click="handleShare"
+              >
+                分享
+                <img src="/images/share.png" alt="分享" class="h-[14px] w-[14px] object-contain" />
+              </button>
+            </section>
+
+            <section class="mt-6 border-t border-brown-8/70 pt-6">
+              <h2 class="font-secondary text-[40px] font-black text-brown-1">目的與效用</h2>
+              <p class="mt-3 max-w-[1180px] text-[16px] leading-8 text-brown-3">
+                {{ purposeText }}
+              </p>
+            </section>
+
+            <section class="mt-7 border-t border-brown-8/70 pt-6">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <h2 class="font-secondary text-[40px] font-black text-brown-1">操作教學</h2>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 rounded-full border border-brown-2 px-3 py-1 text-[13px] font-bold text-brown-2 hover:bg-white/60"
+                >
+                  示範影片
+                  <IconsChevronRight :size="14" :stroke-width="2" />
+                </button>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-4">
+                <article
+                  v-for="item in teachSteps"
+                  :key="item.title"
+                  class="rounded-xl border border-brown-8/60 bg-white/75 p-4 shadow-sm"
+                >
+                  <h3 class="text-[30px] font-black text-brown-4">{{ item.title }}</h3>
+                  <p class="mt-2 text-[15px] leading-7 text-brown-3">{{ item.content }}</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="mt-7 border-t border-brown-8/70 pt-6">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <h2 class="font-secondary text-[40px] font-black text-brown-1">討論區相關文章</h2>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 rounded-full border border-brown-2 px-3 py-1 text-[13px] font-bold text-brown-2 hover:bg-white/60"
+                >
+                  前往討論區
+                  <IconsChevronRight :size="14" :stroke-width="2" />
+                </button>
+              </div>
+
+              <BasePaginatedGrid :items="discussionCards" :page-size="2" grid-class="grid gap-4 md:grid-cols-2">
+                <template #default="{ item }">
+                  <article class="rounded-xl border border-brown-8/70 bg-white/70 p-4">
+                    <p class="mb-2 text-xs font-semibold tracking-wide text-brown-6">使用者暱稱 {{ item.date }}</p>
+                    <h4 class="line-clamp-1 text-lg font-bold text-brown-1">{{ item.title }}</h4>
+                    <p class="mt-1 line-clamp-2 text-sm text-brown-3">{{ item.summary }}</p>
+                  </article>
+                </template>
+              </BasePaginatedGrid>
+            </section>
+
+            <section class="mt-7 border-t border-brown-8/70 pt-6">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <h2 class="font-secondary text-[40px] font-black text-brown-1">學習歷程</h2>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 rounded-full border border-brown-2 px-3 py-1 text-[13px] font-bold text-brown-2 hover:bg-white/60"
+                >
+                  過往課程列表
+                  <IconsChevronRight :size="14" :stroke-width="2" />
+                </button>
+              </div>
+
+              <article class="rounded-xl border border-brown-8/60 bg-white/75 p-4">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div class="flex w-full flex-col gap-2 text-brown-5 lg:flex-1 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="flex items-end gap-4 lg:min-w-[260px] lg:justify-start">
+                      <p class="text-[30px] font-black">{{ historySummary.title }}</p>
+                      <p class="text-[16px] font-semibold">{{ historySummary.date }}</p>
+                    </div>
+                    <div class="flex w-full flex-wrap items-end gap-3 lg:flex-1 lg:justify-center lg:gap-10">
+                      <p class="text-[16px] font-semibold">尋求協助 <span class="text-[45px] font-black leading-none">{{ historySummary.helpCount }}</span> 次</p>
+                      <p class="text-[16px] font-semibold">嘗試次數 <span class="text-[45px] font-black leading-none">{{ historySummary.attemptCount }}</span> 次</p>
+                      <p class="text-[16px] font-semibold">快朗秒數 <span class="font-genyogothic text-[60px] font-black leading-none">{{ historySummary.seconds }}</span> 秒</p>
+                    </div>
+                  </div>
+
+                  <div class="flex shrink-0 gap-4">
+                    <BaseButton variant="brown-soft" size="small" class="!h-11 !rounded-xl !px-14 !text-sm">音檔回放</BaseButton>
+                    <BaseButton variant="brown-soft" size="small" class="!h-11 !rounded-xl !px-14 !text-sm">教材下載</BaseButton>
+                  </div>
+                </div>
+              </article>
+            </section>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+
+interface StepItem {
+  title: string
+  content: string
+}
+
+interface DiscussionItem {
+  id: string
+  date: string
+  title: string
+  summary: string
+}
+
+interface TaskProgress {
+  current: number
+  total: number
+  label: string
+  percent: number
+  stars: number
+}
+
+interface HistorySummary {
+  title: string
+  date: string
+  helpCount: number
+  attemptCount: number
+  seconds: number
+}
+
+interface TaskPayload {
+  id: string
+  title: string
+  purpose: string
+  progress: TaskProgress
+  teachSteps: StepItem[]
+  discussionCards: DiscussionItem[]
+  historySummary: HistorySummary
+}
+
+interface Props {
+  modelValue: boolean
+  taskId?: string
+}
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+}>()
+
+const defaultTeachSteps: StepItem[] = [
+  {
+    title: '步驟一 閱讀文章',
+    content: '雖然說是閱讀文章，但主要是看看是否有自己不會唸的詞彙，在大致閱讀完文章後，就請不用文章的主旨也沒有關係，因為我們主要是透過這個練習去訓練速度，而非理解能力。'
+  },
+  {
+    title: '步驟二 朗讀文章',
+    content: '嘗試唸讀一次文章，並且確認自己大致了解大部分的詞彙的發音，但別太拘泥發音要跟母語者一樣。'
+  },
+  {
+    title: '步驟三 加快朗讀速度',
+    content: '每當快朗文章都有根據其難度固定的秒數限制，在剛剛嘗試唸過並知道朗讀速度之後，這次可以嘗試看看能快一點，看看能否在秒數內唸完。'
+  },
+  {
+    title: '步驟四 適時求助',
+    content: '在這邊要先拋棄自己的完美主義，我們要的是「盡力」，在秒速內唸完，但如果練習的次數超過10次，那代表快朗的過程有問題產生，你需要把快朗的練習至少暫停CAT，諮詢師會根據你的狀況給予相對應的解決方式。'
+  }
+]
+
+const defaultDiscussionCards: DiscussionItem[] = [
+  {
+    id: '1',
+    date: 'YYYY.MM.DD',
+    title: '關於日文學習......',
+    summary: '哈囉，小弟是最近成為學員的初學者，想問問一些問題，不知道大家是怎麼想的......'
+  },
+  {
+    id: '2',
+    date: 'YYYY.MM.DD',
+    title: '關於日文學習......',
+    summary: '哈囉，小弟是最近成為學員的初學者，想問問一些問題，不知道大家是怎麼想的......'
+  },
+  {
+    id: '3',
+    date: '2026.05.03',
+    title: '快朗第三週心得',
+    summary: '這週開始有抓到節奏，發音速度和穩定度都有明顯提升。'
+  },
+  {
+    id: '4',
+    date: '2026.05.04',
+    title: '想請教停頓點怎麼抓',
+    summary: '有些長句會卡住，大家都怎麼分段練習？'
+  },
+  {
+    id: '5',
+    date: '2026.05.06',
+    title: '推薦朗讀練習工具',
+    summary: '分享我用來計時和回聽的工具，練習效率提高很多。'
+  },
+  {
+    id: '6',
+    date: '2026.05.08',
+    title: '第一次達標分享',
+    summary: '今天終於在目標秒數內完成，想謝謝社群提供的方法。'
+  }
+]
+
+const taskTitle = ref('快朗')
+const purposeText = ref('快朗練習旨在提高學習者的語言閱讀速度及發音品質，在練習的過程中，學習者不需要過份去理解文章內容。透過練習，學習者可以更快掌握新詞彙的語感，增進語感，並在未來的學習中更有效率地吸收語言知識。')
+const taskProgress = ref<TaskProgress>({
+  current: 1,
+  total: 5,
+  label: '任務狀態',
+  percent: 24,
+  stars: 4
+})
+const teachSteps = ref<StepItem[]>(defaultTeachSteps)
+const discussionCards = ref<DiscussionItem[]>(defaultDiscussionCards)
+const historySummary = ref<HistorySummary>({
+  title: '江戸時代',
+  date: '2023.11.15',
+  helpCount: 1,
+  attemptCount: 1,
+  seconds: 43
+})
+
+const defaultTaskData: TaskPayload = {
+  id: 'fast-reading',
+  title: '快朗',
+  purpose: '快朗練習旨在提高學習者的語言閱讀速度及發音品質，在練習的過程中，學習者不需要過份去理解文章內容。透過練習，學習者可以更快掌握新詞彙的語感，增進語感，並在未來的學習中更有效率地吸收語言知識。',
+  progress: { current: 1, total: 5, label: '任務狀態', percent: 24, stars: 4 },
+  teachSteps: defaultTeachSteps,
+  discussionCards: defaultDiscussionCards,
+  historySummary: { title: '江戸時代', date: '2023.11.15', helpCount: 1, attemptCount: 1, seconds: 43 }
+}
+
+const taskDatabase: Record<string, TaskPayload> = {
+  'fast-reading': defaultTaskData,
+  keyword: {
+    id: 'keyword',
+    title: '關鍵字',
+    purpose: '關鍵字任務著重於擷取文章中高頻與核心語彙，透過重複辨識與造句應用，建立長期記憶與語意連結。',
+    progress: { current: 2, total: 8, label: '任務進度', percent: 30, stars: 3 },
+    teachSteps: [
+      { title: '步驟一 先找高頻詞', content: '先快速掃描段落，標記重複出現的詞彙並分類主題。' },
+      { title: '步驟二 對照語境', content: '將詞彙放回原文句子，理解語境和語氣差異。' },
+      { title: '步驟三 主動造句', content: '用新詞彙完成 3 到 5 個情境句，提升實際應用能力。' },
+      { title: '步驟四 週期複習', content: '隔天、三天、一週做快速回顧，鞏固記憶曲線。' }
+    ],
+    discussionCards: [
+      { id: 'k1', date: '2026.05.05', title: '關鍵字怎麼記最快？', summary: '大家都怎麼做關鍵字卡片？我目前是主題分類。' },
+      { id: 'k2', date: '2026.05.07', title: '推薦詞彙複習節奏', summary: '我用 1-3-7 天的複習節奏，成效比每天背更穩。' },
+      { id: 'k3', date: '2026.05.08', title: '如何建立主題字庫', summary: '先用主題分類再補同義詞，記憶會更快串起來。' },
+      { id: 'k4', date: '2026.05.09', title: '關鍵字筆記格式分享', summary: '我會固定記詞性、例句和情境，回顧時很好用。' }
+    ],
+    historySummary: { title: '食文化', date: '2024.01.06', helpCount: 2, attemptCount: 3, seconds: 58 }
+  }
+}
+
+const fetchTaskDataById = async (taskId: string): Promise<TaskPayload> => {
+  // TODO: Replace with real API call once backend is ready.
+  const normalizedId = taskId.trim() || 'fast-reading'
+  return taskDatabase[normalizedId] ?? defaultTaskData
+}
+
+const applyTaskData = (data: TaskPayload) => {
+  taskTitle.value = data.title
+  purposeText.value = data.purpose
+  taskProgress.value = data.progress
+  teachSteps.value = data.teachSteps
+  discussionCards.value = data.discussionCards
+  historySummary.value = data.historySummary
+}
+
+const loadTaskData = async (taskId?: string) => {
+  const data = await fetchTaskDataById(taskId || 'fast-reading')
+  applyTaskData(data)
+}
+
+watch(
+  () => props.taskId,
+  (taskId) => {
+    void loadTaskData(taskId)
+  },
+  { immediate: true }
+)
+
+const filledTaskStars = computed(() => Math.max(0, Math.min(5, Math.round(taskProgress.value.stars))))
+
+const closePopup = () => {
+  emit('update:modelValue', false)
+}
+
+const shareUrl = computed(() => {
+  if (typeof window === 'undefined') return ''
+
+  return props.taskId
+    ? `${window.location.origin}/learning-task/${encodeURIComponent(props.taskId)}`
+    : `${window.location.origin}/learning-task`
+})
+
+const openLineShare = () => {
+  const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl.value)}`
+  window.open(url, 'line-share', 'width=600,height=600,resizable=yes')
+}
+
+const handleShare = () => {
+  if (!shareUrl.value) return
+
+  openLineShare()
+}
+</script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.popup-scroll {
+  scrollbar-gutter: stable both-edges;
+}
+</style>

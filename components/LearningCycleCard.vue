@@ -315,11 +315,13 @@ const handleActionClick = (button: ActionButtonConfig) => {
   if (button.disabled)
     return
 
+  if (button.key === 'view-report') {
+    return
+  }
+
   const routeByActionKey: Partial<Record<ActionButtonConfig['key'], string>> = {
     'go-test': '/learning-task',
-    'book-consultation': '/consultation',
-    // Currently no dedicated report page; route to learning task as report entry.
-    'view-report': '/learning-task'
+    'book-consultation': '/consultation'
   }
 
   const targetPath = routeByActionKey[button.key]

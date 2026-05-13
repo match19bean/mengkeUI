@@ -48,9 +48,7 @@
                     </span>
                   </div>
 
-                  <div class="border-b-[6px] border-primary-1"></div>
-
-                  <p class="h-[30px] w-auto font-genyogothic text-[16px] font-black leading-[22px] tracking-[2px] text-left text-brown-1 opacity-100">
+                  <p class="pt-2 h-[30px] w-auto font-genyogothic text-[16px] font-black leading-[22px] tracking-[2px] text-left text-brown-1 opacity-100">
                     {{ courseHero.schedule }}
                   </p>
                 </div>
@@ -71,7 +69,7 @@
                       <span
                         v-for="star in 5"
                         :key="star"
-                        class="text-lg"
+                         class="text-[25px]"
                         :class="star <= filledStars ? 'text-[#f5c44a]' : 'text-brown-7'"
                       >
                         ★

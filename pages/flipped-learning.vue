@@ -72,10 +72,11 @@
           scenario-status="請進行諮商預約"
         />
 
-        <CurrentLearningPanel :items="currentLearningItems" />
+        <CurrentLearningPanel :items="currentLearningItems" @item-click="openLearningTaskPopup" />
 
-        <LearningHistoryPanel :items="learningHistoryItems" />
+        <LearningHistoryPanel :items="learningHistoryItems" @item-click="openLearningTaskPopup" />
       </div>
+
     </div>
   </div>
 </template>
@@ -98,6 +99,11 @@ interface RadarDataItem {
 
 // 搜尋相關
 const searchQuery = ref('')
+
+const openLearningTaskPopup = (item?: { taskId?: string }) => {
+  const taskId = item?.taskId || 'fast-reading'
+  void navigateTo(`/learning-task/${encodeURIComponent(taskId)}`)
+}
 
 const selectedCourse = ref<string | number | null>(null)
 
@@ -196,6 +202,7 @@ const chartData = [
 
 const currentLearningItems = [
   {
+    taskId: 'fast-reading',
     title: '快朗',
     actionText: '預約或上傳音檔',
     actionClass: 'bg-primary-2 text-white',
@@ -205,6 +212,7 @@ const currentLearningItems = [
     progressClass: 'bg-primary-2'
   },
   {
+    taskId: 'mind-map',
     title: '組織圖',
     current: 7,
     total: 20,
@@ -212,6 +220,7 @@ const currentLearningItems = [
     progressClass: 'bg-complementary-1'
   },
   {
+    taskId: 'keyword',
     title: '關鍵字',
     current: 10,
     total: 16,
@@ -219,6 +228,7 @@ const currentLearningItems = [
     progressClass: 'bg-secondary-1'
   },
   {
+    taskId: 'required-course',
     title: '必修課',
     actionText: '前往聚樂部',
     actionClass: 'bg-complementary-2 text-white',
@@ -230,10 +240,10 @@ const currentLearningItems = [
 ]
 
 const learningHistoryItems = [
-  { title: '快朗', tags: ['聽力', '口說'], time: '今天 08:31' },
-  { title: '組織圖', tags: ['閱讀', '邏輯', '記憶'], time: '昨天 15:31' },
-  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
-  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
-  { title: '歷程簡稱', tags: ['學習標籤', '學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' }
+  { taskId: 'fast-reading', title: '快朗', tags: ['聽力', '口說'], time: '今天 08:31' },
+  { taskId: 'mind-map', title: '組織圖', tags: ['閱讀', '邏輯', '記憶'], time: '昨天 15:31' },
+  { taskId: 'keyword', title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
+  { taskId: 'required-course', title: '歷程簡稱', tags: ['學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' },
+  { taskId: 'fast-reading', title: '歷程簡稱', tags: ['學習標籤', '學習標籤', '學習標籤'], time: 'YYYY年MM月DD日 hh:mm' }
 ]
 </script>

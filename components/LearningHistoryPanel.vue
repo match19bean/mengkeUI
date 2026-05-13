@@ -8,7 +8,12 @@
       <article
         v-for="item in items"
         :key="`${item.title}-${item.time}`"
-        class="grid grid-cols-[minmax(0,72px)_1fr_auto] items-center gap-5 rounded-2xl bg-white px-4 py-5 shadow-[0_2px_10px_rgba(54,32,16,0.05)]"
+        class="grid cursor-pointer grid-cols-[minmax(0,72px)_1fr_auto] items-center gap-5 rounded-2xl bg-white px-4 py-5 shadow-[0_2px_10px_rgba(54,32,16,0.05)] transition hover:bg-brown-9/40"
+        role="button"
+        tabindex="0"
+        @click="handleItemClick(item)"
+        @keydown.enter="handleItemClick(item)"
+        @keydown.space.prevent="handleItemClick(item)"
       >
         <p class="truncate text-title font-black text-brown-1">{{ item.title }}</p>
 
@@ -30,6 +35,7 @@
             type="button"
             class="text-brown-6 transition-colors hover:text-brown-3"
             :aria-label="`${item.title} 詳細`"
+            @click.stop="handleItemClick(item)"
           >
             <span aria-hidden="true">
                 <IconsChevronRight :size="25" :stroke-width="1.5" />
@@ -42,6 +48,7 @@
 
 <script setup lang="ts">
 export interface LearningHistoryItem {
+  taskId?: string
   title: string
   tags?: string[]
   tag1?: string
@@ -54,6 +61,14 @@ interface Props {
 }
 
 defineProps<Props>()
+
+const emit = defineEmits<{
+  'item-click': [item: LearningHistoryItem]
+}>()
+
+const handleItemClick = (item: LearningHistoryItem) => {
+  emit('item-click', item)
+}
 
 const getTags = (item: LearningHistoryItem) => {
   if (Array.isArray(item.tags) && item.tags.length > 0) {
