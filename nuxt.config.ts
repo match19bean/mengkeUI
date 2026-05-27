@@ -3,6 +3,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag === 'tw-city-selector'
+    }
+  },
   css: ['~/assets/css/design-tokens.css'],
   runtimeConfig: {
     public: {

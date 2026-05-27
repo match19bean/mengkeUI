@@ -1,120 +1,67 @@
-# Nuxt 3 專案開發指南
+# Copilot instructions for this repository
 
-## 技術棧
+## Build, test, and lint commands
 
-- **框架**: Nuxt 3 + Vue 3 (Composition API)
-- **語言**: TypeScript
-- **樣式**: Tailwind CSS + 自定義設計 tokens
-- **套件管理**: pnpm
-- **字體**: Gen Jyuu Gothic X P (主要字體)
-
-## 專案結構
-
-```
-components/     基礎可重用組件 (Base*) 和業務組件
-composables/    Vue composables (useAuth, useRegister 等)
-pages/          路由頁面 (自動路由)
-assets/css/     全域樣式和設計 tokens
-server/api/     API 端點
-types/          TypeScript 型別定義
-public/         靜態資源
-```
-
-## 開發規範
-
-### 組件命名
-
-- **基礎組件**: 使用 `Base` 前綴 (如 `BaseButton.vue`, `BaseInput.vue`)
-- **業務組件**: 使用描述性名稱 (如 `CourseCard.vue`, `ProfilePopup.vue`)
-- **圖標組件**: 放在 `components/icons/` 目錄
-
-### Composables 規範
-
-- 使用 `use` 前綴命名 (如 `useAuth.ts`, `useRegister.ts`)
-- 應導出函式，內部使用 `useState`, `useRuntimeConfig` 等 Nuxt composables
-- 包含完整的 TypeScript 型別定義
-
-### 樣式規範
-
-- **優先使用**: Tailwind CSS utility classes
-- **設計 tokens**: 使用 `assets/css/design-tokens.css` 中定義的 CSS 變數
-- **顏色系統**:
-  - Primary: `primary-1` 到 `primary-4` (珊瑚紅)
-  - Secondary: `secondary-1` 到 `secondary-4` (青綠色)
-  - Brown: `brown-1` 到 `brown-10` (棕色系)
-  - Alert: `alert-1`, `alert-2` (警告紅)
-  - Complementary: `complementary-1/2/3` (輔助色)
-
-### TypeScript 規範
-
-- 使用 `interface` 定義組件 Props 和 API 回應
-- 使用 `<script setup lang="ts">` 語法
-- 為組件 emits 提供型別定義
-- API 請求和回應都要有型別定義
-
-### 組件開發模式
-
-**基礎組件範例** (BaseButton.vue):
-```vue
-<script setup lang="ts">
-interface Props {
-  variant?: 'primary' | 'secondary' | 'outline'
-  size?: 'large' | 'medium' | 'small'
-  disabled?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  size: 'medium'
-})
-
-const emit = defineEmits<{
-  click: [event: MouseEvent]
-}>()
-</script>
-```
-
-### API 開發
-
-- API 端點放在 `server/api/` 目錄
-- 使用 `useRuntimeConfig()` 獲取 API base URL
-- API Base: `process.env.NUXT_PUBLIC_API_BASE` (預設: `http://143.198.93.171/api`)
-
-### 狀態管理
-
-- 優先使用 Nuxt 內建的 `useState` 進行狀態管理
-- 跨組件共享狀態時使用 composables
-- 範例: `useAuth` composable 管理用戶認證狀態
-
-## 開發命令
+Use `pnpm`; the repo pins `pnpm@9` in `package.json`.
 
 ```bash
-# 安裝依賴
 pnpm install
-
-# 啟動開發伺服器 (http://localhost:3000)
 pnpm dev
-
-# 建構生產版本
 pnpm build
-
-# 預覽生產版本
 pnpm preview
-
-# 生成靜態網站
 pnpm generate
 ```
 
-## 頁面路由
+- Full build: `pnpm build`
+- Dev server: `pnpm dev`
+- Preview production build: `pnpm preview`
+- Generate static output: `pnpm generate`
+- Single test: **not available**
+- Full test suite: **not available**
+- Lint: **not available**
 
-Nuxt 3 使用檔案系統路由:
-- `pages/index.vue` → `/`
-- `pages/login.vue` → `/login`
-- `pages/settings.vue` → `/settings`
+There is currently no `test`, `lint`, or typecheck script in `package.json`, and there are no `*.spec.*` or `*.test.*` files in the repository. Do not invent Vitest, Jest, ESLint, or single-test commands unless the task explicitly adds that tooling.
 
-## 注意事項
+## High-level architecture
 
-- 使用 Nuxt 自動導入特性，無需手動導入組件和 composables
-- 圖片資源放在 `public/images/` 目錄，使用 `/images/` 路徑引用
-- 設計稿遵循設計 tokens，維持視覺一致性
-- 開發時確保 TypeScript 型別正確，避免 `any` 類型
+- `app.vue` is the global application shell. It renders the persistent `BaseSidebar`, hosts `NuxtPage`, and controls the `ProfilePopup`. The sidebar is hidden only on `/login` and `/signup`.
+- Authentication is front-end state only right now. `composables/useAuth.ts` stores the token and user in Nuxt `useState`, restores them from `localStorage` in `initAuth()`, and currently returns **fake login data** instead of calling a real backend.
+- Most pages are composition-heavy screens built from reusable `Base*` components plus feature components:
+  - `pages/index.vue`: home dashboard
+  - `pages/club.vue`: club/course catalog and popup-driven course detail flow
+  - `pages/flipped-learning.vue`: learning analytics dashboard
+  - `pages/login.vue` and `pages/signup.vue`: standalone auth screens
+- The deep-link routes `pages/course/[id].vue` and `pages/learning-task/[id].vue` are redirect shims, not real detail pages. They set SEO metadata, then redirect into query-based flows such as `/club?course=...` and `/learning-task?taskId=...`.
+- Search is split across two layers:
+  - `components/TopSearchBar.vue` uses `useSearchStore()`
+  - `composables/useSearchStore.ts` calls `${runtimeConfig.public.apiBase}/search/suggestions`
+  - `server/api/search.get.ts` exists as a local Nitro mock endpoint, but the current UI does **not** call it
+- Runtime API configuration is centralized in `nuxt.config.ts` under `runtimeConfig.public.apiBase`, defaulting to `http://143.198.93.171/api`.
+
+## Mock vs real data boundaries
+
+- `useAuth.ts` is still a mock auth layer. It persists auth state locally, but `login()` returns fake member/token data.
+- `useRegister.ts` is also still mock-first. It returns success-shaped placeholder data and does not call a live registration endpoint.
+- `useSearchStore.ts` is wired to the external API base from `runtimeConfig.public.apiBase`.
+- `server/api/search.get.ts` is only a local Nitro mock endpoint for search-like behavior; it is not the current source used by `TopSearchBar`.
+- Many page-level datasets in `pages/index.vue`, `pages/club.vue`, `pages/flipped-learning.vue`, and popup components are hardcoded UI/demo data. Preserve those placeholders unless the task is specifically about replacing them with real API calls.
+
+## Where to make changes
+
+- If the change affects the global frame, sidebar visibility, or profile popup mounting, start in `app.vue`.
+- If the change should be reusable across screens, check `components/Base*.vue` first and extend the existing primitive instead of duplicating markup at page level.
+- If the change is page-specific styling or content composition, keep it in the page component and use class overrides rather than pushing page-only behavior into a base component.
+- If the change is shared state or cross-route UI behavior, prefer the existing composable + `useState` pattern (`useAuth`, `useProfilePopup`, `useSearchStore`) instead of introducing Pinia or a new store layer.
+- Treat `pages/course/[id].vue` and `pages/learning-task/[id].vue` as redirect entry points. They are not the main implementation surface for course/task UI.
+
+## Key conventions
+
+- Reusable UI primitives live in `components/Base*.vue`. Before adding one-off markup, check whether a base component already exists and extend its props/variants if the change is meant to be reused.
+- Nuxt auto-imports are part of the workflow here. Do not add unnecessary manual imports for Nuxt composables when the framework already provides them.
+- Styling is a mix of Tailwind utilities and project design tokens:
+  - global CSS tokens are defined in `assets/css/design-tokens.css`
+  - Tailwind colors, typography, spacing, and safelisted token class patterns are defined in `tailwind.config.js`
+  - pages frequently pass extra utility classes into base components, so preserve that override pattern instead of hardcoding page-specific variants into the base component
+- Shared cross-route state is handled with Nuxt composables plus `useState` (`useAuth`, `useProfilePopup`, `useSearchStore`), not Pinia or a custom store layer.
+- Types are defined inline with `interface` in SFCs/composables and in `types/` for shared API contracts such as `types/search.ts`. Follow the existing `<script setup lang="ts">` pattern.
+- Public assets are referenced with absolute `/images/...` paths from `public\images`.
