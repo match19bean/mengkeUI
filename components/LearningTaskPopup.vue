@@ -202,16 +202,16 @@
                     <button
                       v-if="recordingPracticeId !== practice.id"
                       type="button"
-                      :disabled="!practice.active || !!practice.reported || recordingPracticeId !== null"
+                      :disabled="!!practice.reported || recordingPracticeId !== null"
                       :class="[
                         'shrink-0 rounded-lg px-4 py-2 text-sm font-bold transition',
-                        practice.active && !practice.reported && recordingPracticeId === null
+                        !practice.reported && recordingPracticeId === null
                           ? 'bg-[#e05c3a] text-white hover:opacity-90'
                           : 'cursor-not-allowed bg-brown-8 text-brown-6'
                       ]"
                       @click="startRecording(practice)"
                     >
-                      錄音｜練習 <span :class="practice.active && !practice.reported ? 'text-red-300' : ''">●</span>
+                      錄音｜練習 <span :class="!practice.reported ? 'text-red-300' : ''">●</span>
                     </button>
 
                     <button

@@ -6,7 +6,7 @@
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
         @click.self="closePopup"
       >
-      <div class="relative flex h-[92vh] w-full max-w-[1340px] flex-col overflow-hidden rounded-[28px] bg-cream shadow-popup">
+       <div class="mx-auto flex h-[95vh] w-full max-w-[1540px] flex-col overflow-hidden rounded-[28px] border border-brown-8 bg-cream shadow-[0_12px_30px_rgba(54,32,16,0.14)]">
         <div class="flex shrink-0 items-center justify-end px-4 pt-4 lg:px-8">
           <button
             type="button"
@@ -81,7 +81,7 @@
 
               <div class="mt-4 flex gap-3">
                 <BaseButton variant="secondary" size="small" class="!h-11 !rounded-xl !text-sm basis-[60%] !px-0">進入課堂</BaseButton>
-                <BaseButton variant="secondary" size="small" class="!h-11 !rounded-xl !text-sm basis-[30%] !px-0">今日教材</BaseButton>
+                <BaseButton variant="secondary" size="small" class="!h-11 !rounded-xl !text-sm basis-[30%] !px-0" @click="downloadMaterial(courseHero.materialUrl, courseHero.title + ' 教材')">今日教材</BaseButton>
                 <button
                   type="button"
                   class="inline-flex h-11 basis-[10%] items-center justify-center gap-1 rounded-xl border border-complementary-1 bg-complementary-1 px-0 text-sm text-cream transition hover:opacity-80"
@@ -236,6 +236,7 @@ interface CourseHeroData {
   image?: string
   goal?: string
   intro?: string
+  materialUrl?: string
 }
 
 interface ArticleItem {
@@ -318,6 +319,14 @@ const shareUrl = computed(() => {
     ? `${window.location.origin}/course/${props.courseId}`
     : window.location.href
 })
+
+const downloadMaterial = (url?: string, filename?: string) => {
+  if (!url) { alert('目前無可下載的教材'); return }
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename ?? '今日教材'
+  a.click()
+}
 
 const openLineShare = () => {
   const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl.value)}`
