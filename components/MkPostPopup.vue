@@ -201,7 +201,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onBeforeUnmount } from 'vue'
+import { computed, ref } from 'vue'
 
 interface Reply {
   id: string
@@ -252,42 +252,7 @@ const emit = defineEmits<{
   'bookmark': [id: string]
 }>()
 
-let previousBodyOverflow = ''
-let previousMainOverflowY = ''
-
-const lockBackgroundScroll = (locked: boolean) => {
-  if (typeof document === 'undefined') return
-
-  const mainEl = document.querySelector('main') as HTMLElement | null
-
-  if (locked) {
-    previousBodyOverflow = document.body.style.overflow
-    previousMainOverflowY = mainEl?.style.overflowY ?? ''
-
-    document.body.style.overflow = 'hidden'
-    if (mainEl) {
-      mainEl.style.overflowY = 'hidden'
-    }
-    return
-  }
-
-  document.body.style.overflow = previousBodyOverflow
-  if (mainEl) {
-    mainEl.style.overflowY = previousMainOverflowY
-  }
-}
-
-watch(
-  () => props.modelValue,
-  (isOpen) => {
-    lockBackgroundScroll(isOpen)
-  },
-  { immediate: true }
-)
-
-onBeforeUnmount(() => {
-  lockBackgroundScroll(false)
-})
+useOverlayScrollLock(() => props.modelValue)
 
 const activeSort = ref<'熱門' | '最新' | '最舊'>('熱門')
 const newComment = ref('')

@@ -394,6 +394,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+useOverlayScrollLock(() => props.modelValue)
+
 type PopupView = 'detail' | 'recording'
 const currentView = ref<PopupView>('detail')
 

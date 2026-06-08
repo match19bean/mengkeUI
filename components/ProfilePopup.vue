@@ -230,6 +230,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+useOverlayScrollLock(() => props.modelValue)
+
 const closePopup = () => {
   emit('update:modelValue', false)
 }

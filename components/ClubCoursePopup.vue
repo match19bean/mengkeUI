@@ -265,6 +265,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+useOverlayScrollLock(() => props.modelValue)
+
 // TODO: 當 API 就緒後，改為 watch(props.courseId, fetchCourseData)
 const courseHero = ref<CourseHeroData>({
   title: 'JLPT N5 文法精修班',

@@ -583,6 +583,8 @@ const emit = defineEmits<{
   'complete': [data: any]
 }>()
 
+useOverlayScrollLock(() => props.modelValue)
+
 const currentStep = ref(1)
 
 // 台灣縣市地址選擇器

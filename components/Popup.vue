@@ -15,6 +15,8 @@
 
 <script setup lang="ts">
 const emit = defineEmits<{ close: [], confirm: [] }>()
+
+useOverlayScrollLock(() => true)
 </script>
 
 <style scoped>

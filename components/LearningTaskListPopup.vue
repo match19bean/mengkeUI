@@ -81,6 +81,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+useOverlayScrollLock(() => props.modelValue)
+
 const tasks = ref<TaskItem[]>([
   { id: 'fast-reading', title: '快朗', stars: 4, current: 1, total: 5 },
   { id: 'keyword', title: '關鍵字', stars: 3, current: 2, total: 8 },
