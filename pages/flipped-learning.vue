@@ -1,12 +1,5 @@
 <template>
-  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
-    <div class="mx-auto w-full max-w-[1440px] space-y-8">
-      <!-- 頂部搜尋列 -->
-      <TopSearchBar 
-        v-model="searchQuery"
-        :suggestions="searchSuggestions"
-        @select="handleSearchSelect"
-      />
+  <BasePageShell>
       <section class="grid gap-4 xl:grid-cols-7"> 
         <!-- 課程出席率 -->
         <div class="grid grid-rows-[auto_auto_1fr] gap-2 xl:col-span-5">
@@ -77,13 +70,11 @@
         <LearningHistoryPanel :items="learningHistoryItems" @item-click="openLearningTaskPopup" />
       </div>
 
-    </div>
-  </div>
+  </BasePageShell>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import TopSearchBar from '@/components/TopSearchBar.vue'
 import LearningCurveChart from '~/components/LearningCurveChart.vue'
 import RadarChart from '@/components/RadarChart.vue'
 import CourseDropdown from '~/components/CourseDropdown.vue'

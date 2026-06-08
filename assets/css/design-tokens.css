@@ -82,6 +82,17 @@
   box-sizing: border-box;
 }
 
+/* Keep layout width stable when vertical scrollbars appear/disappear. */
+html {
+  scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
+}
+
 body {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-body);

@@ -1,10 +1,6 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-brown-10">
+  <BasePageShell>
     <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <!-- 頂部搜尋列 -->
-      <div class="shrink-0 px-6 pt-5 pb-3">
-        <TopSearchBar v-model="searchQuery" :suggestions="[]" />
-      </div>
 
       <!-- 分類 Tabs + 操作按鈕（同一行） -->
       <div class="flex shrink-0 items-center gap-3 px-6 pb-3">
@@ -58,7 +54,7 @@
           </div>
 
           <!-- 文章列表 -->
-          <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+          <div class="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable] px-6 pb-6">
             <!-- 文章卡片 -->
             <div class="space-y-3">
               <article
@@ -135,7 +131,7 @@
         <div class="w-[1px] shrink-0 opacity-40" style="background: linear-gradient(to bottom, #501C1C00, #432C2C 50%, #501C1C00);" />
 
         <!-- 廣告欄 -->
-        <div class="flex w-[350px] shrink-0 flex-col gap-4 overflow-y-auto px-4 py-5">
+        <div class="flex w-[350px] shrink-0 flex-col gap-4 overflow-y-auto [scrollbar-gutter:stable] px-4 py-5">
           <h3 class="font-genyogothic text-[14px] font-black text-brown-4">活動／廣告</h3>
           <div class="h-[220px] rounded-2xl bg-brown-8 flex items-center justify-center">
             <span class="text-sm font-semibold text-brown-5">廣告版位 1</span>
@@ -157,7 +153,7 @@
       @like="toggleLike"
       @bookmark="toggleBookmark"
     />
-  </div>
+  </BasePageShell>
 </template>
 
 <script setup lang="ts">

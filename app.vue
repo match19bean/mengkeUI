@@ -18,7 +18,7 @@
     <div v-if="!hideSidebar" class="w-[1px] opacity-50" style="background: linear-gradient(to bottom, #501C1C00, #432C2C 50%, #501C1C00);"></div>
 
     <!-- 主要內容區 -->
-    <main class="flex-1 overflow-y-auto h-screen">
+    <main class="flex-1 overflow-y-auto [scrollbar-gutter:stable] h-screen">
       <NuxtPage />
     </main>
     

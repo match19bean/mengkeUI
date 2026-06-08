@@ -5,19 +5,12 @@
         v-if="modelValue && post"
         class="fixed inset-0 z-[9999] flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4"
         @click.self="$emit('update:modelValue', false)"
+        @wheel.self.prevent
+        @touchmove.self.prevent
       >
         <div class="flex h-[96vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-t-[28px] bg-cream shadow-2xl sm:rounded-[28px]">
-          <!-- ── 頂部固定 Header（返回 + 標題 + 標籤） ── -->
+          <!-- ── 頂部固定 Header（關閉 + 標題 + 標籤） ── -->
           <div class="flex shrink-0 items-center gap-2 border-b border-brown-8/40 px-4 py-3">
-            <button
-              type="button"
-              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brown-3 transition hover:bg-brown-9"
-              @click="$emit('update:modelValue', false)"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13L5 8l5-5" />
-              </svg>
-            </button>
             <span class="font-genyogothic text-xl font-black text-brown-1 shrink-0">{{ post.title }}</span>
             <div class="flex flex-wrap items-center gap-1.5">
               <span
@@ -29,10 +22,20 @@
                 {{ tag }}
               </span>
             </div>
+            <button
+              type="button"
+              class="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brown-3 transition hover:bg-brown-9"
+              @click="$emit('update:modelValue', false)"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4l8 8" />
+                <path d="M12 4l-8 8" />
+              </svg>
+            </button>
           </div>
 
           <!-- ── 捲動區 ── -->
-          <div class="min-h-0 flex-1 overflow-y-auto">
+          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             <!-- 作者 -->
             <div class="flex items-center gap-2.5 px-6 pt-4 pb-3">
               <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-brown-7">
@@ -45,8 +48,8 @@
             </div>
 
             <!-- 文章圖片 -->
-            <div v-if="post.image" class="w-full">
-              <img :src="post.image" :alt="post.title" class="h-[220px] w-full object-cover" />
+            <div v-if="post.image" class="flex w-full justify-center">
+              <img :src="post.image" :alt="post.title" class="h-[420px] w-[80%] rounded-2xl object-cover" />
             </div>
             <div v-else class="mx-6 h-[180px] rounded-2xl bg-brown-8 flex items-center justify-center">
               <span class="text-sm text-brown-5">文章圖片</span>
@@ -198,7 +201,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 
 interface Reply {
   id: string
@@ -248,6 +251,43 @@ const emit = defineEmits<{
   'like': [id: string]
   'bookmark': [id: string]
 }>()
+
+let previousBodyOverflow = ''
+let previousMainOverflowY = ''
+
+const lockBackgroundScroll = (locked: boolean) => {
+  if (typeof document === 'undefined') return
+
+  const mainEl = document.querySelector('main') as HTMLElement | null
+
+  if (locked) {
+    previousBodyOverflow = document.body.style.overflow
+    previousMainOverflowY = mainEl?.style.overflowY ?? ''
+
+    document.body.style.overflow = 'hidden'
+    if (mainEl) {
+      mainEl.style.overflowY = 'hidden'
+    }
+    return
+  }
+
+  document.body.style.overflow = previousBodyOverflow
+  if (mainEl) {
+    mainEl.style.overflowY = previousMainOverflowY
+  }
+}
+
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    lockBackgroundScroll(isOpen)
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  lockBackgroundScroll(false)
+})
 
 const activeSort = ref<'熱門' | '最新' | '最舊'>('熱門')
 const newComment = ref('')

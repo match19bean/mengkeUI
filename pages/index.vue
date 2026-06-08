@@ -1,12 +1,5 @@
 <template>
-  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
-    <div class="mx-auto w-full max-w-[1440px] space-y-8">
-      <!-- 頂部搜尋列 -->
-      <TopSearchBar 
-        v-model="searchQuery"
-        :suggestions="searchSuggestions"
-        @select="handleSearchSelect"
-      />
+  <BasePageShell>
 
       <div class="grid gap-6 2xl:grid-cols-[3fr_1fr]">
         <!-- 左側主內容 -->
@@ -107,8 +100,7 @@
           </div>
         </aside>
       </div>
-    </div>
-  </div>
+  </BasePageShell>
 </template>
 
 <script setup lang="ts">
@@ -117,7 +109,6 @@ import { useRouter } from 'vue-router'
 import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
 import CourseCardSimple from '@/components/CourseCardSimple.vue'
 import BaseCarousel from '@/components/BaseCarousel.vue'
-import TopSearchBar from '@/components/TopSearchBar.vue'
 
 const router = useRouter()
 const { isAuthenticated, logout } = useAuth()

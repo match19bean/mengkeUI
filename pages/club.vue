@@ -1,12 +1,5 @@
 <template>
-  <div class="min-h-screen bg-cream px-4 py-6 mx-10">
-    <div class="mx-auto w-full max-w-[1440px] space-y-8">
-      <!-- 頂部搜尋列 -->
-      <TopSearchBar 
-        v-model="searchQuery"
-        :suggestions="searchSuggestions"
-        @select="handleSearchSelect"
-      />
+  <BasePageShell>
 
       <!-- 課程卡片區域 -->
       <section class="space-y-4">
@@ -168,14 +161,12 @@
         :course-id="activeCourse?.id"
         @update:model-value="(val) => { if (!val) closeClubCoursePopup(); else isClubCoursePopupOpen = true }"
       />
-    </div>
-  </div>
+  </BasePageShell>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import TopSearchBar from '@/components/TopSearchBar.vue'
 import ClassProgressCard from '@/components/ClassProgressCard.vue'
 import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
 import { useAuth } from '@/composables/useAuth'
