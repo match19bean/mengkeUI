@@ -1,5 +1,7 @@
 <template>
-  <BasePageShell>
+  <NuxtPage v-if="isComposeRoute" />
+
+  <BasePageShell v-else>
     <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
 
       <!-- 分類 Tabs + 操作按鈕（同一行） -->
@@ -24,7 +26,7 @@
         <button
           type="button"
           class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary-1 px-5 py-2.5 text-sm font-bold text-cream transition hover:opacity-85"
-          @click="composeOpen = true"
+          @click="goToComposePage"
         >
           發文
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -175,7 +177,13 @@ type Tab = typeof tabs[number]
 const activeTab = ref<Tab>('全部主題')
 
 // ── 發文 ──
-const composeOpen = ref(false)
+const route = useRoute()
+const router = useRouter()
+const isComposeRoute = computed(() => route.path === '/mk-lobby/new')
+
+const goToComposePage = () => {
+  router.push({ name: 'mk-lobby-new' })
+}
 
 // ── 文章詳頁 Popup ──
 const postPopupOpen = ref(false)
