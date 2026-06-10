@@ -15,7 +15,7 @@
               </BaseTypography>
             </div>
             <div class="space-y-1">
-              <BaseCarousel :items="carouselItems" :autoplay="true" :interval="6000" />
+              <BaseCarousel :items="carouselItems ?? []" :autoplay="true" :interval="6000" />
             </div>
           </section>
 
@@ -39,7 +39,7 @@
                   :show-info-icon="true"
                   :show-arrow="true"
                 />
-                <CircleStatsGroup :items="statsItems" />
+                <CircleStatsGroup :items="statsItems ?? []" />
               </div>
             </div>
 
@@ -65,7 +65,7 @@
               <!-- 課程卡片會填滿剩餘空間 -->
               <div class="space-y-3">
                 <CourseCardSimple
-                  v-for="course in courses"
+                  v-for="course in (courses ?? [])"
                   :key="course.title"
                   v-bind="course"
                 />
@@ -127,47 +127,53 @@ const handleSearchSelect = (suggestion: any) => {
   console.log('選擇了:', suggestion)
 }
 
-const statsItems = [
-  { value: '-', label: '-', color: '#6B3F2E', maxValue: 100 },
-  { value: '-', label: '-', color: '#D95847', maxValue: 100 },
-  { value: '-', label: '-', color: '#F2A74B', maxValue: 100 },
-  { value: '-', label: '-', color: '#3E7871', maxValue: 100 }
-]
+const { data: statsItems } = await useAsyncData('home-stats', () =>
+  Promise.resolve([
+    { value: '-', label: '-', color: '#6B3F2E', maxValue: 100 },
+    { value: '-', label: '-', color: '#D95847', maxValue: 100 },
+    { value: '-', label: '-', color: '#F2A74B', maxValue: 100 },
+    { value: '-', label: '-', color: '#3E7871', maxValue: 100 }
+  ])
+)
 
-const courses = [
-  {
-    title: 'N5文法',
-    status: '進行中',
-    tags: ['N5', '文法', '聽力'],
-    progress: 65,
-    timeInfo: '上午10:00 - 中午12:30'
-  },
-  {
-    title: '日文主題發表',
-    status: '今天',
-    tags: ['N3', '口說', '應對'],
-    progress: 45,
-    timeInfo: '晚上09:00 - 晚上10:30'
-  }
-]
+const { data: courses } = await useAsyncData('home-courses', () =>
+  Promise.resolve([
+    {
+      title: 'N5文法',
+      status: '進行中',
+      tags: ['N5', '文法', '聽力'],
+      progress: 65,
+      timeInfo: '上午10:00 - 中午12:30'
+    },
+    {
+      title: '日文主題發表',
+      status: '今天',
+      tags: ['N3', '口說', '應對'],
+      progress: 45,
+      timeInfo: '晚上09:00 - 晚上10:30'
+    }
+  ])
+)
 
-const carouselItems = ref<CarouselItem[]>([
-  {
-    id: 1,
-    image: '/images/Carousel1.png',
-    alt: '輪播圖片 1'
-  },
-  {
-    id: 2,
-    image: 'https://placehold.co/800x400/3E7871/FFFFFF?text=Slide+2',
-    alt: '輪播圖片 2'
-  },
-  {
-    id: 3,
-    image: 'https://placehold.co/800x400/F2A74B/FFFFFF?text=Slide+3',
-    alt: '輪播圖片 3'
-  }
-])
+const { data: carouselItems } = await useAsyncData('home-carousel', () =>
+  Promise.resolve([
+    {
+      id: 1,
+      image: '/images/Carousel1.png',
+      alt: '輪播圖片 1'
+    },
+    {
+      id: 2,
+      image: 'https://placehold.co/800x400/3E7871/FFFFFF?text=Slide+2',
+      alt: '輪播圖片 2'
+    },
+    {
+      id: 3,
+      image: 'https://placehold.co/800x400/F2A74B/FFFFFF?text=Slide+3',
+      alt: '輪播圖片 3'
+    }
+  ] as CarouselItem[])
+)
 
 // 搜尋建議假資料（含 url/type/selectable 欄位）
 const searchSuggestions = [
