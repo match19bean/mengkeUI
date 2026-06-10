@@ -30,13 +30,9 @@ interface Props {
   errorMessage?: string
   disabled?: boolean
   width?: string
-  height?: string
-  bgColor?: string
   textAlign?: 'left' | 'center' | 'right'
-  textColor?: string
-  textSize?: string
-  placeholderSize?: string
-  placeholderColor?: string
+  variant?: 'default' | 'filled'
+  size?: 'md' | 'lg'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,13 +41,9 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   error: false,
   width: 'w-full',
-  height: 'h-[32px]',
-  bgColor: 'bg-[#36201019]',
   textAlign: 'left',
-  textColor: 'text-brown-1',
-  textSize: 'text-base',
-  placeholderSize: 'text-xs',
-  placeholderColor: 'text-brown-6'
+  variant: 'default',
+  size: 'md',
 })
 
 const emit = defineEmits<{
@@ -66,43 +58,45 @@ const inputValue = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
+const variantClasses: Record<string, { bg: string; text: string }> = {
+  default: { bg: 'bg-brown-1/10', text: 'text-brown-1' },
+  filled:  { bg: 'bg-primary-1/35', text: 'text-cream' },
+}
+
+const sizeClasses: Record<string, { height: string; textSize: string }> = {
+  md: { height: 'h-[32px]', textSize: 'text-base' },
+  lg: { height: 'h-[50px]', textSize: 'text-[20px]' },
+}
+
 const inputClasses = computed(() => {
+  const { bg, text } = variantClasses[props.variant]
+  const { height, textSize } = sizeClasses[props.size]
   const textAlignClass = props.textAlign === 'center' ? 'text-center' : props.textAlign === 'right' ? 'text-right' : 'text-left'
-  const baseClasses = `${props.width} ${props.height} px-4 ${props.textSize} font-primary rounded-[32px] ${props.bgColor} ${textAlignClass} ${props.textColor} transition-all duration-200 flex items-center`
+  const baseClasses = `${props.width} ${height} px-4 ${textSize} font-primary rounded-[32px] ${bg} ${textAlignClass} ${text} transition-all duration-200`
   const normalClasses = 'border-0 focus:outline-none focus:ring-2 focus:ring-secondary-1/30'
   const errorClasses = 'border border-alert-1 focus:ring-alert-1/30 text-alert-1'
   const disabledClasses = 'bg-brown-9 cursor-not-allowed opacity-60'
-  
+
   return [
     baseClasses,
     props.error ? errorClasses : normalClasses,
-    props.disabled ? disabledClasses : ''
+    props.disabled ? disabledClasses : '',
   ].filter(Boolean).join(' ')
 })
 
 const placeholderStyle = computed(() => {
   const colorMap: Record<string, string> = {
-    'text-[#F8F7F0]': '#F8F7F0',
-    'text-brown-6': '#A89A8D',
-    'text-gray-400': '#9CA3AF'
+    default: '#A89A8D',
+    filled: '#F8F7F0',
   }
-  
   const sizeMap: Record<string, string> = {
-    'text-xs': '0.75rem',
-    'text-sm': '0.875rem',
-    'text-base': '1rem',
-    'text-lg': '1.125rem',
-    'text-xl': '1.25rem',
-    'text-[20px]': '20px',
-    'text-[22px]': '22px'
+    md: '0.75rem',
+    lg: '20px',
   }
-  
-  const color = colorMap[props.placeholderColor] || '#A89A8D'
-  const size = sizeMap[props.placeholderSize] || '0.75rem'
-  
+
   return {
-    '--placeholder-color': color,
-    '--placeholder-size': size
+    '--placeholder-color': colorMap[props.variant],
+    '--placeholder-size': sizeMap[props.size],
   }
 })
 
@@ -120,6 +114,6 @@ const handleBlur = (event: FocusEvent) => {
 input::placeholder {
   color: var(--placeholder-color);
   font-size: var(--placeholder-size);
-  letter-spacing: 0.125rem; /* tracking-[2px] */
+  letter-spacing: 0.125rem;
 }
 </style>
