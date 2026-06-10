@@ -40,7 +40,8 @@ export const useSearchStore = () => {
       }
 
       return { success: false, data: [] }
-    } catch {
+    } catch (error) {
+      console.error('Failed to fetch suggestions:', error)
       suggestions.value = []
       return { success: false, data: [] }
     } finally {
