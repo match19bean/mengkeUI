@@ -1,101 +1,52 @@
 import type { SearchSuggestionsParams, SearchResult, SearchSuggestionsData } from '@/types/search'
 
-/**
- * 搜尋功能的 composable
- */
 export const useSearchStore = () => {
-  const config = useRuntimeConfig()
-  const API_BASE = config.public.apiBase
-  
-  // 使用 useState 保存搜尋建議
+  const { call } = useApi()
+
   const suggestions = useState<string[]>('search-suggestions', () => [])
   const pending = useState<boolean>('search-pending', () => false)
 
-  /**
-   * 從 API 回應中提取所有建議文字
-   */
   const extractSuggestions = (data: SearchSuggestionsData): string[] => {
     const results: string[] = []
-    
-    // 提取 products.name
-    if (data.products?.name) {
-      results.push(...data.products.name)
-    }
-    
-    // 提取 club_course_infos 的所有欄位
+
+    if (data.products?.name) results.push(...data.products.name)
+
     if (data.club_course_infos) {
-      if (data.club_course_infos.name) {
-        results.push(...data.club_course_infos.name)
-      }
-      if (data.club_course_infos.description) {
-        results.push(...data.club_course_infos.description)
-      }
-      if (data.club_course_infos.details) {
-        results.push(...data.club_course_infos.details)
-      }
+      if (data.club_course_infos.name) results.push(...data.club_course_infos.name)
+      if (data.club_course_infos.description) results.push(...data.club_course_infos.description)
+      if (data.club_course_infos.details) results.push(...data.club_course_infos.details)
     }
-    
-    // 提取其他分類
-    if (data.members?.name) {
-      results.push(...data.members.name)
-    }
-    if (data.notices?.title) {
-      results.push(...data.notices.title)
-    }
-    if (data.orders?.title) {
-      results.push(...data.orders.title)
-    }
-    
+
+    if (data.members?.name) results.push(...data.members.name)
+    if (data.notices?.title) results.push(...data.notices.title)
+    if (data.orders?.title) results.push(...data.orders.title)
+
     return results
   }
 
-  /**
-   * 獲取搜尋建議
-   */
   const getSearchSuggestions = async (params: SearchSuggestionsParams) => {
     pending.value = true
 
     try {
-      const response = await $fetch<SearchResult<SearchSuggestionsData>>(
-        `${API_BASE}/search/suggestions`,
-        {
-          params: {
-            query: params.query,
-            limit: params.limit || 5
-          }
-        }
+      const response = await call<SearchResult<SearchSuggestionsData>>(
+        '/search/suggestions',
+        { params: { query: params.query, limit: params.limit || 5 } }
       )
-      
+
       if (response.success && response.data) {
-        // 提取建議
-        const extractedSuggestions = extractSuggestions(response.data)
-        suggestions.value = extractedSuggestions
-        
-
-        return {
-          success: true,
-          data: extractedSuggestions
-        }
+        const extracted = extractSuggestions(response.data)
+        suggestions.value = extracted
+        return { success: true, data: extracted }
       }
 
-      return {
-        success: false,
-        data: []
-      }
-    } catch (error) {
+      return { success: false, data: [] }
+    } catch {
       suggestions.value = []
-      return {
-        success: false,
-        data: []
-      }
+      return { success: false, data: [] }
     } finally {
       pending.value = false
     }
   }
 
-  return {
-    suggestions,
-    pending,
-    getSearchSuggestions
-  }
+  return { suggestions, pending, getSearchSuggestions }
 }
