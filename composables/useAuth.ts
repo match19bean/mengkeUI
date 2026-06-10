@@ -1,3 +1,5 @@
+import type { User } from '@/types/auth'
+
 interface LoginParams {
   account: string
   password: string
@@ -7,35 +9,19 @@ interface LoginResponse {
   access_token: string
   token_type: string
   expires_in: number
-  member: {
-    id: number
-    nickname: string
-    account: string
-    email: string
-    email_valid: number
-    password: string
-    status: number
-  }
+  member: User
 }
 
-/**
- * 認證相關的 composable
- */
 export const useAuth = () => {
   const config = useRuntimeConfig()
   const API_BASE = config.public.apiBase
 
-  // 使用 useState 保存用戶資訊和 token
-  const user = useState<any>('auth-user', () => null)
+  const user = useState<User | null>('auth-user', () => null)
   const token = useState<string | null>('auth-token', () => null)
   const isAuthenticated = computed(() => !!token.value)
 
-  /**
-   * 登入
-   */
   const login = async (params: LoginParams) => {
     // --- FAKE LOGIN ---
-    // 這裡直接模擬登入成功，回傳假資料
     const fakeResponse: LoginResponse = {
       access_token: 'fake-access-token',
       token_type: 'bearer',
@@ -46,7 +32,6 @@ export const useAuth = () => {
         account: params.account,
         email: 'demo@example.com',
         email_valid: 1,
-        password: params.password,
         status: 1
       }
     }
@@ -69,9 +54,6 @@ export const useAuth = () => {
     }
   }
 
-  /**
-   * 登出
-   */
   const logout = () => {
     token.value = null
     user.value = null
@@ -82,9 +64,6 @@ export const useAuth = () => {
     }
   }
 
-  /**
-   * 初始化認證狀態（從 localStorage 恢復）
-   */
   const initAuth = () => {
     if (import.meta.client) {
       const savedToken = localStorage.getItem('auth-token')
@@ -92,7 +71,7 @@ export const useAuth = () => {
 
       if (savedToken && savedUser) {
         token.value = savedToken
-        user.value = JSON.parse(savedUser)
+        user.value = JSON.parse(savedUser) as User
       }
     }
   }
