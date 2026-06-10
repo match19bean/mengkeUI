@@ -14,7 +14,6 @@ interface LoginResponse {
 
 export const useAuth = () => {
   const config = useRuntimeConfig()
-  const API_BASE = config.public.apiBase
 
   const user = useState<User | null>('auth-user', () => null)
   const token = useState<string | null>('auth-token', () => null)

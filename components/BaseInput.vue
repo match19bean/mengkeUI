@@ -11,7 +11,6 @@
       :disabled="disabled"
       :class="inputClasses"
       :style="placeholderStyle"
-      @input="handleInput"
       @blur="handleBlur"
       class="rounded-full"
     />
@@ -99,11 +98,6 @@ const placeholderStyle = computed(() => {
     '--placeholder-size': sizeMap[props.size],
   }
 })
-
-const handleInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('update:modelValue', target.value)
-}
 
 const handleBlur = (event: FocusEvent) => {
   emit('blur', event)
