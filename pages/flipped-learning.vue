@@ -74,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 import { ref } from 'vue'
 import LearningCurveChart from '~/components/LearningCurveChart.vue'
 import RadarChart from '@/components/RadarChart.vue'

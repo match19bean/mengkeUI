@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 import { computed, ref, watch } from 'vue'
 
 const popupOpen = ref(true)
