@@ -1,3 +1,5 @@
+export type UserRole = 'Teacher' | 'Student'
+
 export interface User {
   id: number
   nickname: string
@@ -5,4 +7,5 @@ export interface User {
   email: string
   email_valid: 0 | 1
   status: 0 | 1
+  type: UserRole
 }

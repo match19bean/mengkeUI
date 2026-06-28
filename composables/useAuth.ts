@@ -31,7 +31,8 @@ export const useAuth = () => {
         account: params.account,
         email: 'demo@example.com',
         email_valid: 1,
-        status: 1
+        status: 1,
+        type: params.account.toLowerCase().includes('teacher') ? 'Teacher' : 'Student'
       }
     }
 

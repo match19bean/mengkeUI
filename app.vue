@@ -1,14 +1,16 @@
 <template>
   <div class="flex min-h-screen max-h-screen bg-brown-10">
     <!-- 左側功能列 -->
-    <BaseSidebar 
+    <BaseSidebar
       v-if="!hideSidebar"
       :user-name="displayName"
       :current-path="currentPath"
-        :user-avatar="user?.value?.avatar || ''"
+      :user-avatar="user?.value?.avatar || ''"
       :menu-items="sidebarMenuItems"
       :cat-lesson-locked="catLessonLocked"
       :learning-task-locked="learningTaskLocked"
+      :show-learning-section="isStudent"
+      :home-path="isStudent ? '/' : '/teacher'"
       @navigate="handleNavigate"
       class="flex-shrink-0"
       style="flex-basis: clamp(270px, 15%, 400px);"
@@ -55,16 +57,30 @@ onMounted(() => {
   initAuth()
 })
 
-const catLessonLocked = computed(() => {
-  return !isAuthenticated.value
-})
+const isStudent = computed(() => !isAuthenticated.value || user.value?.type !== 'Teacher')
 
-const learningTaskLocked = computed(() => {
-  return !isAuthenticated.value
-})
+const catLessonLocked = computed(() => !isAuthenticated.value)
+const learningTaskLocked = computed(() => !isAuthenticated.value)
 
 const sidebarMenuItems = computed(() => {
   const logged = !!isAuthenticated?.value
+  if (logged && user.value?.type === 'Teacher') {
+    return [
+      {
+        name: '主界面',
+        path: '/teacher',
+        expandable: true,
+        children: [
+          { name: '聚樂部', path: '/teacher/club' },
+          { name: '反轉學習', path: '/teacher/flipped-learning' },
+          { name: 'MK大廳', path: '/teacher/mk-lobby' },
+        ]
+      },
+      { name: '個人資料', path: '/profile', icon: '/images/file.svg' },
+      { name: '學習諮商室', path: '/teacher/consultation', icon: '/images/user-group.svg' },
+      { name: '設定', path: '/settings', icon: '/images/setting-01.svg' }
+    ]
+  }
   return [
     {
       name: '主界面',

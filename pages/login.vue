@@ -204,7 +204,7 @@ const handleLogin = async () => {
     })
 
     if (result.success) {
-      router.push('/')
+      router.push(result.data.user.type === 'Teacher' ? '/teacher' : '/')
     } else {
       // 顯示錯誤訊息
       alert(result.message || '登入失敗')

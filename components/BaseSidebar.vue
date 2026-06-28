@@ -2,7 +2,7 @@
   <aside class="w-auto bg-cream flex flex-col h-screen">
     <!-- 產品 LOGO -->
     <div class="pt-6">
-      <button @click="$emit('navigate', '/')" class="flex items-center justify-center w-full hover:opacity-80 transition-opacity">
+      <button @click="$emit('navigate', homePath)" class="flex items-center justify-center w-full hover:opacity-80 transition-opacity">
         <img 
           src="/images/logo.png" 
           alt="Product Logo" 
@@ -102,24 +102,25 @@
             </button>
         </template>
         
-        <!-- 與專屬CAT聯繫按鈕 -->
-        
-        <!-- 漸淡分隔線 -->
-        <div class="h-[1px] mx-8 my-5 opacity-50" style="background: linear-gradient(to right, #501C1C00, #432C2C 50%, #501C1C00);"></div>
+        <!-- 與專屬CAT聯繫按鈕（老師不顯示） -->
+        <template v-if="showLearningSection">
+          <!-- 漸淡分隔線 -->
+          <div class="h-[1px] mx-8 my-5 opacity-50" style="background: linear-gradient(to right, #501C1C00, #432C2C 50%, #501C1C00);"></div>
 
-        <button
-            @click="$emit('navigate', '/cat-lesson')"
-            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:text-brown-1 hover:bg-brown-9 transition-colors"
-            :class="{ 'pointer-events-none': catLessonLocked }"
-            style="color: #2422208F"
-        >
-            <span class="flex-1 text-left text-subtitle font-primary">與專屬CAT聯繫</span>
-            <img v-if="catLessonLocked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
-        </button>
+          <button
+              @click="$emit('navigate', '/cat-lesson')"
+              class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:text-brown-1 hover:bg-brown-9 transition-colors"
+              :class="{ 'pointer-events-none': catLessonLocked }"
+              style="color: #2422208F"
+          >
+              <span class="flex-1 text-left text-subtitle font-primary">與專屬CAT聯繫</span>
+              <img v-if="catLessonLocked" src="/images/sidebar-lock.svg" alt="locked" width="20" height="20" class="flex-shrink-0" />
+          </button>
+        </template>
     </nav>    
 
-    <!-- 底部區塊：進行學習任務 -->
-    <div class="px-4 pb-6 flex-shrink-0">
+    <!-- 底部區塊：進行學習任務（老師不顯示） -->
+    <div v-if="showLearningSection" class="px-4 pb-6 flex-shrink-0">
 
        <!-- 插圖 -->
       <ClientOnly>
@@ -127,7 +128,7 @@
           <img src="/images/Layer_4.png" alt="學習插圖" class="w-full h-auto object-contain" />
         </div>
       </ClientOnly>
-      <div class="bg-gradient-to-br bg-[#FF9B7A] to-[#FF7A5C] rounded-[24px] p-6 relative overflow-hidden">               
+      <div class="bg-gradient-to-br bg-[#FF9B7A] to-[#FF7A5C] rounded-[24px] p-6 relative overflow-hidden">
         <!-- 按鈕 -->
         <button
           @click="$emit('navigate', '/learning-task')"
@@ -163,12 +164,16 @@ interface Props {
   catLessonLocked?: boolean
   learningTaskLocked?: boolean
   currentPath?: string
+  showLearningSection?: boolean
+  homePath?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   userName: '',
   userAvatar: '',
   currentPath: '',
+  showLearningSection: true,
+  homePath: '/',
   menuItems: () => [
     {
       name: '主界面',
