@@ -5,7 +5,7 @@
       v-if="!hideSidebar"
       :user-name="displayName"
       :current-path="currentPath"
-      :user-avatar="user?.value?.avatar || ''"
+      :user-avatar="user?.avatar || ''"
       :menu-items="sidebarMenuItems"
       :cat-lesson-locked="catLessonLocked"
       :learning-task-locked="learningTaskLocked"
@@ -30,17 +30,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import ProfilePopup from '@/components/ProfilePopup.vue'
+import { computed } from 'vue'
+import ProfilePopup from '@/components/feature/ProfilePopup.vue'
 import { useProfilePopup } from '@/composables/useProfilePopup'
 
 const route = useRoute()
 const router = useRouter()
 const { isOpen: isProfilePopupOpen, open: openProfilePopup } = useProfilePopup()
-// call useAuth() safely — if it's unavailable during init (e.g. SSR),
-// provide fallbacks so `.value` access won't throw
-const _auth = (typeof useAuth === 'function' ? useAuth() : null) ?? { user: ref(null), isAuthenticated: ref(false), initAuth: () => {} }
-const { user, isAuthenticated, initAuth } = _auth
+const { user, isAuthenticated } = useAuth()
 
 const currentPath = computed(() => route.path)
 const hideSidebar = computed(() => ['/login', '/signup'].includes(route.path))
@@ -50,11 +47,6 @@ const displayName = computed(() => {
     return user.value.nickname || user.value.account
   }
   return '訪客模式'
-})
-
-// 初始化認證狀態
-onMounted(() => {
-  initAuth()
 })
 
 const isStudent = computed(() => !isAuthenticated.value || user.value?.type !== 'Teacher')

@@ -167,8 +167,8 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import ClassProgressCard from '@/components/ClassProgressCard.vue'
-import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
+import ClassProgressCard from '@/components/feature/ClassProgressCard.vue'
+import ClubCoursePopup from '@/components/feature/ClubCoursePopup.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()

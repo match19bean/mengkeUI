@@ -13,10 +13,11 @@ interface LoginResponse {
 }
 
 export const useAuth = () => {
-  const config = useRuntimeConfig()
-
-  const user = useState<User | null>('auth-user', () => null)
-  const token = useState<string | null>('auth-token', () => null)
+  // Cookies are readable during SSR, so route middleware sees the auth state
+  // on first render / hard refresh (localStorage would only exist client-side).
+  const cookieOpts = { maxAge: 60 * 60 * 24 * 7, sameSite: 'lax' as const, path: '/' }
+  const user = useCookie<User | null>('auth-user', { ...cookieOpts, default: () => null })
+  const token = useCookie<string | null>('auth-token', { ...cookieOpts, default: () => null })
   const isAuthenticated = computed(() => !!token.value)
 
   const login = async (params: LoginParams) => {
@@ -39,11 +40,6 @@ export const useAuth = () => {
     token.value = fakeResponse.access_token
     user.value = fakeResponse.member
 
-    if (import.meta.client) {
-      localStorage.setItem('auth-token', fakeResponse.access_token)
-      localStorage.setItem('auth-user', JSON.stringify(fakeResponse.member))
-    }
-
     return {
       success: true,
       message: '登入成功',
@@ -57,23 +53,6 @@ export const useAuth = () => {
   const logout = () => {
     token.value = null
     user.value = null
-
-    if (import.meta.client) {
-      localStorage.removeItem('auth-token')
-      localStorage.removeItem('auth-user')
-    }
-  }
-
-  const initAuth = () => {
-    if (import.meta.client) {
-      const savedToken = localStorage.getItem('auth-token')
-      const savedUser = localStorage.getItem('auth-user')
-
-      if (savedToken && savedUser) {
-        token.value = savedToken
-        user.value = JSON.parse(savedUser) as User
-      }
-    }
   }
 
   return {
@@ -81,7 +60,6 @@ export const useAuth = () => {
     token,
     isAuthenticated,
     login,
-    logout,
-    initAuth
+    logout
   }
 }

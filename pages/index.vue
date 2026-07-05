@@ -106,9 +106,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
-import CourseCardSimple from '@/components/CourseCardSimple.vue'
-import BaseCarousel from '@/components/BaseCarousel.vue'
+import CircleStatsGroup from '@/components/feature/CircleStatsGroup.vue'
+import CourseCardSimple from '@/components/feature/CourseCardSimple.vue'
+import BaseCarousel from '@/components/base/BaseCarousel.vue'
 
 const router = useRouter()
 const { isAuthenticated, logout } = useAuth()

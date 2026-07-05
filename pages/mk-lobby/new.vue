@@ -314,7 +314,7 @@ import { TextAlign } from '@tiptap/extension-text-align'
 import { Image } from '@tiptap/extension-image'
 import { Underline } from '@tiptap/extension-underline'
 import { FontFamily } from '@tiptap/extension-font-family'
-import TiptapResizableImage from '~/components/TiptapResizableImage.vue'
+import TiptapResizableImage from '~/components/feature/TiptapResizableImage.vue'
 
 // ── Tiptap extensions (defined before reactive state, no component-state dependency) ──
 

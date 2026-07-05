@@ -76,12 +76,12 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 import { ref } from 'vue'
-import LearningCurveChart from '~/components/LearningCurveChart.vue'
-import RadarChart from '@/components/RadarChart.vue'
-import CourseDropdown from '~/components/CourseDropdown.vue'
-import LearningCycleCard from '~/components/LearningCycleCard.vue'
-import CurrentLearningPanel from '~/components/CurrentLearningPanel.vue'
-import LearningHistoryPanel from '~/components/LearningHistoryPanel.vue'
+import LearningCurveChart from '~/components/chart/LearningCurveChart.vue'
+import RadarChart from '@/components/chart/RadarChart.vue'
+import CourseDropdown from '~/components/feature/CourseDropdown.vue'
+import LearningCycleCard from '~/components/feature/LearningCycleCard.vue'
+import CurrentLearningPanel from '~/components/feature/CurrentLearningPanel.vue'
+import LearningHistoryPanel from '~/components/feature/LearningHistoryPanel.vue'
 
 interface RadarDataItem {
   label: string

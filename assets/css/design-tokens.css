@@ -1,9 +1,4 @@
-/* Global Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Note: Tailwind's Preflight already applies box-sizing/margin resets. */
 
 /* Keep layout width stable when vertical scrollbars appear/disappear. */
 html {

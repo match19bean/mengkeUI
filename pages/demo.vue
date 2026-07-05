@@ -304,9 +304,9 @@ import { ref } from 'vue'
 
 type FrequencyCardValue = number | string
 
-import CircleStatsGroup from '@/components/CircleStatsGroup.vue'
-import Popup from '@/components/Popup.vue'
-import ClubCoursePopup from '@/components/ClubCoursePopup.vue'
+import CircleStatsGroup from '@/components/feature/CircleStatsGroup.vue'
+import Popup from '@/components/feature/Popup.vue'
+import ClubCoursePopup from '@/components/feature/ClubCoursePopup.vue'
 
 const isClubCoursePopupOpen = ref(false)
 
